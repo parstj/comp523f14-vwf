@@ -1,4 +1,65 @@
 # Copyright 2012 United States Government, as represented by Joint Staff – J7
-
 --- 
 extends: http://vwf.example.com/scene.vwf
+properties:
+  keyPressInfo:
+methods:
+  initializeCamera:
+scripts:
+  - |
+    this.initialize = function() {
+      this.future( 0 ).initializeCamera();
+      this.future( 0 ).update();
+    }
+    this.initializeCamera = function() {
+      this.camera.translation = [ 250, -550, 150 ];
+      this.camera.rotation = [ 1, 0, 0, -10 ];
+
+      // Disable navigation
+      this.camera.touchmode = "none";
+      this.camera.navmode = "none";
+    }
+    this.update = function() {
+      if ( this.keyPressInfo ) {
+        for ( var keyPress in this.keyPressInfo.keysDown ) {
+          switch( keyPress ) {
+            case 'W':
+              console.log("Moving playerOne up");
+              break;
+            case 'A':
+              console.log("Moving playerOne left");
+              break;
+            case 'S':
+              console.log("Moving playerOne down");
+              break;
+            case 'D':
+              console.log("Moving playerOne right");
+              break;
+            default:
+              break;
+          }
+        }
+      }
+      this.future( 1.0/60.0 ).update();  // schedule the next step
+    }
+    this.keyDown = this.keyUp = function( input ) {
+      this.keyPressInfo = input;
+    }
+
+children:
+  board:
+    extends: http://vwf.example.com/node3.vwf
+    source: board.dae
+  player1:
+    extends: http://vwf.example.com/node3.vwf
+    source: ball.dae
+    children:
+      ballMaterial:
+        extends: http://vwf.example.com/material.vwf
+        properties:
+          color: "#0000ff"
+  light:
+    extends: http://vwf.example.com/light.vwf
+    properties:
+      distance: 2000
+      translation: [ 400, -400, 900 ]
