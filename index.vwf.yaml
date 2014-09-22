@@ -1,4 +1,3 @@
-# Copyright 2012 United States Government, as represented by Joint Staff – J7
 --- 
 extends: http://vwf.example.com/scene.vwf
 properties:
@@ -68,24 +67,36 @@ scripts:
       }
       this.future( 1.0/60.0 ).update();  // schedule the next step
     }
+
     this.movePlayer = function( player, direction ) {
-      switch( direction ) {
-        case 'U':
-          player.translateBy( [0, this.moveSpeed, 0]);
-          break;
-        case 'L':
-          player.translateBy( [(-1 * this.moveSpeed), 0, 0]);
-          break;
-        case 'D':
-          player.translateBy( [0, (-1 * this.moveSpeed), 0]);
-          break;
-        case 'R':
-          player.translateBy( [this.moveSpeed, 0, 0]);
-          break;
-        default:
-          break;
+   	  if(player.translation[ 0 ] + this.moveSpeed >= 500 || player.translation[ 0 ] + this.moveSpeed <= -500) {
+        console.log("Can't move in x direction");
+   	  } 
+   	  else {
+   	    if(player.translation[ 1 ] + this.moveSpeed >= 120 || player.translation[ 1 ] + this.moveSpeed <= -120) {
+   	  	  console.log("Can't move in y direction");
+   	    } 
+   	    else {
+          switch( direction ) {
+            case 'U':
+              player.translateBy( [0, this.moveSpeed, 0]);
+              break;
+            case 'L':
+              player.translateBy( [(-1 * this.moveSpeed), 0, 0]);
+              break;
+            case 'D':
+              player.translateBy( [0, (-1 * this.moveSpeed), 0]);
+              break;
+            case 'R':
+              player.translateBy( [this.moveSpeed, 0, 0]);
+              break;
+            default:
+              break;
+          }
+   	  	}
       }
     }
+	
     this.keyDown = this.keyUp = function( input ) {
       this.keyPressInfo = input;
     }
