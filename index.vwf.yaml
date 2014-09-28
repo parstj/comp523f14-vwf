@@ -3,6 +3,10 @@ extends: http://vwf.example.com/scene.vwf
 properties:
   keyPressInfo:
   moveSpeed: 2.5
+  topBoundry: 120
+  leftBoundry: -200
+  rightBoundry: 200
+  bottomBoundry: -120
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
@@ -33,12 +37,13 @@ methods:
 scripts:
 - |
     this.initialize = function() {
+
       this.future( 0 ).initializeCamera();
       this.future( 0 ).update();
     }
     this.initializeCamera = function() {
-      this.camera.translation = [ 250, -550, 150 ];
-      this.camera.rotation = [ 1, 0, 0, -10 ];
+      this.camera.translation = [ 250, 0, 600 ];
+      this.camera.rotation = [ 1, 0, 0, -90 ];
 
       // Disable navigation
       this.camera.touchmode = "none";
@@ -69,31 +74,29 @@ scripts:
     }
 
     this.movePlayer = function( player, direction ) {
-      if(player.translation[ 0 ] + this.moveSpeed >= 500 || player.translation[ 0 ] + this.moveSpeed <= -500) {
-        console.log("Can't move in x direction");
-      } 
-      else {
-        if(player.translation[ 1 ] + this.moveSpeed >= 120 || player.translation[ 1 ] + this.moveSpeed <= -120) {
-          console.log("Can't move in y direction");
-        } 
-        else {
-          switch( direction ) {
-            case 'U':
-              player.translateBy( [0, this.moveSpeed, 0]);
-              break;
-            case 'L':
-              player.translateBy( [(-1 * this.moveSpeed), 0, 0]);
-              break;
-            case 'D':
-              player.translateBy( [0, (-1 * this.moveSpeed), 0]);
-              break;
-            case 'R':
-              player.translateBy( [this.moveSpeed, 0, 0]);
-              break;
-            default:
-              break;
+      switch( direction ) {
+        case 'U':
+          if(player.translation[1] + this.moveSpeed <= 150){
+            player.translateBy( [0, this.moveSpeed, 0]);
           }
-        }
+          break;
+        case 'L':
+          if(player.translation[0] + (-1 * this.moveSpeed) >= -250){
+            player.translateBy( [(-1 * this.moveSpeed), 0, 0]);
+          }
+          break;
+        case 'D':
+          if(player.translation[1] + (-1 * this.moveSpeed) >= -150){
+            player.translateBy( [0, (-1 * this.moveSpeed), 0]);  
+          }
+          break;
+        case 'R':
+          if(player.translation[0] + this.moveSpeed <= 250){
+            player.translateBy( [this.moveSpeed, 0, 0]);      
+          }
+          break;
+        default:
+          break;
       }
     }
     
