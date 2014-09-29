@@ -1,12 +1,30 @@
 --- 
 extends: http://vwf.example.com/scene.vwf
 properties:
-  keyPressInfo:
+  # keyPressInfo:
   moveSpeed: 2.5
-  topBoundry: 120
-  leftBoundry: -200
-  rightBoundry: 200
-  bottomBoundry: -120
+  usersShareView: false
+  userObject:
+    extends: http://vwf.example.com/node3.vwf
+    implements: [ "http://vwf.example.com/navigable.vwf" ]
+    properties:
+      translationSpeed: 1000
+      navmode: walk
+    children:
+      camera:
+        extends: http://vwf.example.com/camera.vwf
+        properties:
+          translation: [ 250, 0, 600 ]
+          rotation: [1, 0, 0, -90]
+          far: 1000000
+          near: 1
+      avatar:
+        extends: http://vwf.example.com/node3.vwf
+        source: ball.dae
+        type: model/vnd.collada+xml
+        properties:
+          xPos: 0
+          yPos: 0 
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
@@ -14,17 +32,6 @@ children:
     properties:
       xPos: 0
       yPos: 0
-  playerOne:
-    extends: http://vwf.example.com/node3.vwf
-    source: ball.dae
-    properties:
-      xPos: 0
-      yPos: 0
-    children:
-      playerOneMaterial:
-        extends: http://vwf.example.com/material.vwf
-        properties:
-          color: "#0000ff"
   light:
     extends: http://vwf.example.com/light.vwf
     properties:
@@ -32,15 +39,14 @@ children:
       translation: [ 400, -400, 900 ]
 methods:
   initializeCamera:
-  update:
-  movePlayer:
 scripts:
 - |
     this.initialize = function() {
 
       this.future( 0 ).initializeCamera();
-      this.future( 0 ).update();
+      //this.future( 0 ).update();
     }
+
     this.initializeCamera = function() {
       this.camera.translation = [ 250, 0, 600 ];
       this.camera.rotation = [ 1, 0, 0, -90 ];
@@ -48,58 +54,4 @@ scripts:
       // Disable navigation
       this.camera.touchmode = "none";
       this.camera.navmode = "none";
-    }
-    this.update = function() {
-      if ( this.keyPressInfo ) {
-        for ( var keyPress in this.keyPressInfo.keysDown ) {
-          switch( keyPress ) {
-            case 'W':
-              this.movePlayer(this.playerOne, 'U');
-              break;
-            case 'A':
-              this.movePlayer(this.playerOne, 'L');
-              break;
-            case 'S':
-              this.movePlayer(this.playerOne, 'D');
-              break;
-            case 'D':
-              this.movePlayer(this.playerOne, 'R');
-              break;
-            default:
-              break;
-          }
-        }
-      }
-      this.future( 1.0/60.0 ).update();  // schedule the next step
-    }
-
-    this.movePlayer = function( player, direction ) {
-      switch( direction ) {
-        case 'U':
-          if(player.translation[1] + this.moveSpeed <= 150){
-            player.translateBy( [0, this.moveSpeed, 0]);
-          }
-          break;
-        case 'L':
-          if(player.translation[0] + (-1 * this.moveSpeed) >= -250){
-            player.translateBy( [(-1 * this.moveSpeed), 0, 0]);
-          }
-          break;
-        case 'D':
-          if(player.translation[1] + (-1 * this.moveSpeed) >= -150){
-            player.translateBy( [0, (-1 * this.moveSpeed), 0]);  
-          }
-          break;
-        case 'R':
-          if(player.translation[0] + this.moveSpeed <= 250){
-            player.translateBy( [this.moveSpeed, 0, 0]);      
-          }
-          break;
-        default:
-          break;
-      }
-    }
-    
-    this.keyDown = this.keyUp = function( input ) {
-      this.keyPressInfo = input;
     }
