@@ -2,6 +2,7 @@
 extends: http://vwf.example.com/scene.vwf
 properties:
   # keyPressInfo:
+  makeOwnAvatarVisible: true
   moveSpeed: 2.5
   usersShareView: false
   userObject:
@@ -10,6 +11,7 @@ properties:
     properties:
       translationSpeed: 1000
       navmode: walk
+      translation: [250, 0, 0]
     children:
       camera:
         extends: http://vwf.example.com/camera.vwf
@@ -22,9 +24,6 @@ properties:
         extends: http://vwf.example.com/node3.vwf
         source: ball.dae
         type: model/vnd.collada+xml
-        properties:
-          xPos: 0
-          yPos: 0 
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
@@ -37,21 +36,3 @@ children:
     properties:
       distance: 2000
       translation: [ 400, -400, 900 ]
-methods:
-  initializeCamera:
-scripts:
-- |
-    this.initialize = function() {
-
-      this.future( 0 ).initializeCamera();
-      //this.future( 0 ).update();
-    }
-
-    this.initializeCamera = function() {
-      this.camera.translation = [ 250, 0, 600 ];
-      this.camera.rotation = [ 1, 0, 0, -90 ];
-
-      // Disable navigation
-      this.camera.touchmode = "none";
-      this.camera.navmode = "none";
-    }
