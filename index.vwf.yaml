@@ -1,12 +1,34 @@
 --- 
 extends: http://vwf.example.com/scene.vwf
 properties:
-  keyPressInfo:
+  # keyPressInfo:
+  makeOwnAvatarVisible: true
   moveSpeed: 2.5
-  topBoundry: 120
-  leftBoundry: -200
-  rightBoundry: 200
-  bottomBoundry: -120
+  usersShareView: false
+  userObject:
+    extends: player.vwf
+    implements: [ "http://vwf.example.com/navigable.vwf" ]
+    properties:
+      translationSpeed: 1000
+      color: 
+      navmode: walk
+      translation: [250, 0, 0]
+    children:
+      camera:
+        extends: http://vwf.example.com/camera.vwf
+        properties:
+          translation: [ 250, 0, 600 ]
+          rotation: [1, 0, 0, -90]
+          far: 1000000
+          near: 1
+      avatar:
+        extends: http://vwf.example.com/node3.vwf
+        source: SlothCubert2.dae
+        properties:
+          rotation: [-1, 0, 0, 90]
+          translation: [230, -15, 0]
+          scale: 4
+              
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
@@ -14,33 +36,35 @@ children:
     properties:
       xPos: 0
       yPos: 0
-  playerOne:
-    extends: http://vwf.example.com/node3.vwf
-    source: ball.dae
-    properties:
-      xPos: 0
-      yPos: 0
-    children:
-      playerOneMaterial:
-        extends: http://vwf.example.com/material.vwf
-        properties:
-          color: "#0000ff"
   light:
     extends: http://vwf.example.com/light.vwf
     properties:
       distance: 2000
       translation: [ 400, -400, 900 ]
+  enemy:
+    extends: http://vwf.example.com/node3.vwf
+    source: ball.dae
+    children:
+      material:
+        extends: http://vwf.example.com/material.vwf
+        properties:
+          color: "#ff3333"
+    properties:
+      translation: [ 125, 0, 0 ]
+
 methods:
   initializeCamera:
-  update:
-  movePlayer:
+  initializeEnemy:
+  calculateEnemyMovement:
+  calculateClosestPlayer:
+  findPlayers:
 scripts:
 - |
     this.initialize = function() {
-
       this.future( 0 ).initializeCamera();
-      this.future( 0 ).update();
+      this.future( 0 ).initializeEnemy();
     }
+
     this.initializeCamera = function() {
       this.camera.translation = [ 250, 0, 600 ];
       this.camera.rotation = [ 1, 0, 0, -90 ];
@@ -49,57 +73,70 @@ scripts:
       this.camera.touchmode = "none";
       this.camera.navmode = "none";
     }
-    this.update = function() {
-      if ( this.keyPressInfo ) {
-        for ( var keyPress in this.keyPressInfo.keysDown ) {
-          switch( keyPress ) {
-            case 'W':
-              this.movePlayer(this.playerOne, 'U');
-              break;
-            case 'A':
-              this.movePlayer(this.playerOne, 'L');
-              break;
-            case 'S':
-              this.movePlayer(this.playerOne, 'D');
-              break;
-            case 'D':
-              this.movePlayer(this.playerOne, 'R');
-              break;
-            default:
-              break;
-          }
-        }
-      }
-      this.future( 1.0/60.0 ).update();  // schedule the next step
+
+    this.initializeEnemy = function(){
+      var closestPlayer = this.calculateClosestPlayer();
+      this.calculateEnemyMovement(closestPlayer);
     }
 
-    this.movePlayer = function( player, direction ) {
-      switch( direction ) {
-        case 'U':
-          if(player.translation[1] + this.moveSpeed <= 150){
-            player.translateBy( [0, this.moveSpeed, 0]);
+    this.findPlayers = function() {
+      console.log(this.find("./element(*,'http://vwf.example.com/navigable.vwf')"));
+      return this.find("./element(*,'http://vwf.example.com/navigable.vwf')");
+    }
+
+    this.calculateClosestPlayer = function(){
+      var closestPlayer;
+      var currentDistance;
+      var shortestDistance = 99999;
+      var xDistance, yDistance;
+      var listOfPlayers = this.findPlayers();
+
+      if(listOfPlayers){
+        for(var i = 0; i < listOfPlayers.length; i++){
+          xDistance = this.enemy.translation[0] - listOfPlayers[i].translation[0];
+          yDistance = this.enemy.translation[1] - listOfPlayers[i].translation[1];
+
+          currentDistance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2))
+          if(currentDistance < shortestDistance){
+            shortestDistance = currentDistance;
+            closestPlayer = listOfPlayers[i];
           }
-          break;
-        case 'L':
-          if(player.translation[0] + (-1 * this.moveSpeed) >= -250){
-            player.translateBy( [(-1 * this.moveSpeed), 0, 0]);
-          }
-          break;
-        case 'D':
-          if(player.translation[1] + (-1 * this.moveSpeed) >= -150){
-            player.translateBy( [0, (-1 * this.moveSpeed), 0]);  
-          }
-          break;
-        case 'R':
-          if(player.translation[0] + this.moveSpeed <= 250){
-            player.translateBy( [this.moveSpeed, 0, 0]);      
-          }
-          break;
-        default:
-          break;
+        }
+        return closestPlayer;
       }
+      return undefined;
     }
-    
-    this.keyDown = this.keyUp = function( input ) {
-      this.keyPressInfo = input;
+
+    this.calculateEnemyMovement = function(closestPlayer) {
+      if(!closestPlayer){
+        closestPlayer = this.calculateClosestPlayer();
+      }
+      else{
+        var xDistance = this.enemy.translation[0] - closestPlayer.translation[0];
+        var yDistance = this.enemy.translation[1] - closestPlayer.translation[1];
+
+        //Checks to see if the enemy needs to move
+        if(xDistance != 0 || yDistance != 0){
+          //Checks what direction it needs to move in
+          if(Math.abs(xDistance) > Math.abs(yDistance)){
+            if(xDistance < 0){
+              this.enemy.translateBy([this.moveSpeed, 0, 0]);
+            }
+            else{
+              this.enemy.translateBy([-this.moveSpeed, 0 ,0]);
+            }
+          }
+          else{
+            if(yDistance < 0){
+              this.enemy.translateBy([0, this.moveSpeed, 0]);
+            }
+            else{
+              this.enemy.translateBy([0, -this.moveSpeed, 0]);
+            }
+          }   
+        }
+      }
+
+      this.future( 1.0/60.0 ).calculateEnemyMovement(closestPlayer);
     }
+
