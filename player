@@ -3,23 +3,12 @@ extends: http://vwf.example.com/node3.vwf
 properties:
 	moveSpeed: 2.5
 methods:
-  initializeCamera:
   update:
   movePlayer:
 scripts:
 - |
     this.initialize = function() {
-      this.future( 0 ).initializeCamera();
       this.future( 0 ).update();
-    }
-
-    this.initializeCamera = function() {
-      this.camera.translation = [ 250, 0, 600 ];
-      this.camera.rotation = [ 1, 0, 0, -90 ];
-
-      // Disable navigation
-      this.camera.touchmode = "none";
-      this.camera.navmode = "none";
     }
 
     this.update = function() {
@@ -43,7 +32,6 @@ scripts:
           }
         }
       }
-      this.future( 1.0/60.0 ).update();  // schedule the next step
     }
 
     this.movePlayer = function( direction ) {
@@ -79,4 +67,5 @@ scripts:
     
     this.keyDown = this.keyUp = function( input ) {
       this.keyPressInfo = input;
+      this.update();
     }
