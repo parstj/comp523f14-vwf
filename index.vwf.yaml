@@ -51,12 +51,7 @@ children:
       translation: [ 400, -400, 900 ]
   enemy:
     extends: http://vwf.example.com/node3.vwf
-    source: ball.dae
-    children:
-      material:
-        extends: http://vwf.example.com/material.vwf
-        properties:
-          color: "#ff3333"
+    source: SlothCubert2.dae
     properties:
       translation: [ 125, 0, 0 ]
 events:
