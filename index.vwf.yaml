@@ -43,6 +43,7 @@ children:
     properties:
       xPos: 0
       yPos: 0
+      scale: 40
   light:
     extends: http://vwf.example.com/light.vwf
     properties:
