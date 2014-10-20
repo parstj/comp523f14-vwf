@@ -1,4 +1,6 @@
 ---
+info:
+  title: Escape from Sloth Island
 model:
   vwf/model/threejs:
 view:
