@@ -9,7 +9,7 @@ properties:
     extends: player.vwf
     implements: [ "http://vwf.example.com/navigable.vwf" ]
     properties:
-      ddtranslationSpeed: 1000
+      translationSpeed: 100
       color: 
       navmode: walk
       translation: [250, 0, 0]
@@ -30,6 +30,12 @@ properties:
             extends: http://vwf.example.com/material.vwf
             properties:
               color: "#0000ff"
+    scripts:
+    - |
+        this.transformChanged = function (){
+          console.log("I worked!");
+        }
+        //@ sourceURL=transformedChanged.vwf    
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
@@ -69,6 +75,7 @@ scripts:
     }
 
     this.keyDown = function(states){
+      console.log(states);
     }
 
     this.initializeCamera = function() {
@@ -113,8 +120,8 @@ scripts:
     }
 
     this.enemyHitsPlayer = function (closestPlayer){
-      debugger;
-      console.log("The enemy hit" + closestPlayer);  
+      console.log("The enemy hit");
+      console.log(closestPlayer);  
     }
 
     this.calculateEnemyMovement = function(closestPlayer) {
@@ -128,8 +135,8 @@ scripts:
         var distance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2))
 
         //Checks to see if the enemy needs to move
-        if(distance < 10){        
-          console.log("The enemy hit" + closestPlayer);  
+        if(distance < 10){      
+          this.enemyHitsPlayer(closestPlayer);  
         }
         else if(xDistance != 0 || yDistance != 0){
           //Checks what direction it needs to move in
