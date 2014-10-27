@@ -1,17 +1,21 @@
 --- 
 extends: http://vwf.example.com/scene.vwf
 properties:
-  # keyPressInfo:
-  makeOwnAvatarVisible: true
+  ambientColor: [255, 255, 255]
   moveSpeed: 1.0
+  makeOwnAvatarVisible: true
   usersShareView: false
   userObject:
-    extends: player.vwf
+    extends: http://vwf.example.com/node3.vwf
     implements: [ "http://vwf.example.com/navigable.vwf" ]
     properties:
       translationSpeed: 100
+      rotationSpeed: 0
+      health: 100
+      numTimesDead: 0
       color: 
       navmode: walk
+      lookmode: none
       translation: [250, 0, 0]
     children:
       camera:
@@ -29,58 +33,60 @@ properties:
           material:
             extends: http://vwf.example.com/material.vwf
             properties:
-              color: "#0000ff"
+              color: "#00ffff"
     scripts:
     - |
         this.transformChanged = function (){
-          console.log("I worked!");
+          var myTranslation = this.translation;
+          if(myTranslation[0] > 1000){
+            myTranslation[0] = 1000;
+          }
+          else if(myTranslation[0] < -1000){
+            myTranslation[0] = -1000;
+          }
+          if(myTranslation[1] > 1000){
+            myTranslation[1] = 1000;
+          }
+          else if(myTranslation[1] < -1000){
+            myTranslation[1] = -1000;
+          }
+          console.log("x: " + myTranslation[0] + " y: " + myTranslation[1]);
         }
         //@ sourceURL=transformedChanged.vwf    
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
     source: board.dae
+    children:
+      material:
+        extends: http://vwf.example.com/material.vwf
+        properties:
+          color: "#ffffff"
+          texture: "sloth2.png"  
     properties:
       xPos: 0
       yPos: 0
-      scale: 40
-  light:
-    extends: http://vwf.example.com/light.vwf
-    properties:
-      distance: 2000
-      translation: [ 400, -400, 900 ]
+      scale: 1000000
   enemy:
     extends: http://vwf.example.com/node3.vwf
     source: SlothCubert2.dae
     properties:
-      translation: [ 125, 0, 0 ]
+      translation: [ 0, 0, 0 ]
+      rotation: [-1, 0 , 0 , 90]
+      scale: 4 
 events:
   keyDown:
 methods:
-  initializeCamera:
   initializeEnemy:
   calculateEnemyMovement:
   calculateClosestPlayer:
   enemyHitsPlayer:
+  playerDied:
   findPlayers:
 scripts:
 - |
     this.initialize = function() {
-      this.future( 0 ).initializeCamera();
       this.future( 0 ).initializeEnemy();
-    }
-
-    this.keyDown = function(states){
-      console.log(states);
-    }
-
-    this.initializeCamera = function() {
-      this.camera.translation = [ 250, 0, 600 ];
-      this.camera.rotation = [ 1, 0, 0, -90 ];
-
-      // Disable navigation
-      this.camera.touchmode = "none";
-      this.camera.navmode = "none";
     }
 
     this.initializeEnemy = function(){
@@ -116,8 +122,18 @@ scripts:
     }
 
     this.enemyHitsPlayer = function (closestPlayer){
-      console.log("The enemy hit");
-      console.log(closestPlayer);  
+      closestPlayer.health = closestPlayer.health - 1;
+      if(closestPlayer.health <= 0){
+        playerDied(closestPlayer);
+      }
+      console.log(closestPlayer.health);  
+    }
+
+    this.playerDied = function (closestPlayer){
+      closestPlayer.translateTo( [0, 0, 0]);
+      closestPlayer.numTimesDead = closestPlayer.numTimesDead + 1;
+      closestPlayer.health = 100;
+      console.log("A player has been killed");
     }
 
     this.calculateEnemyMovement = function(closestPlayer) {
