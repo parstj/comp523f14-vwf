@@ -71,6 +71,8 @@ children:
       scale: 1000000
   enemies:
     extends: http://vwf.example.com/node3.vwf
+  bullet:
+    extends: http://vwf.example.com/node3.vwf
 scripts:
 - source: "index-model.js"
     
