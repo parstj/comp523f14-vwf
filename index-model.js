@@ -1,3 +1,4 @@
+//Creates the enemy object
 var enemy = {
   extends: "http://vwf.example.com/node3.vwf",
   source: "ball.dae",
@@ -16,7 +17,7 @@ var enemy = {
 };
 
 this.initialize = function() {
-    console.log("Initialized");
+    //Creates a list of unused enemies for use by the program
     for(var i = 0; i < 10; i++ ){
         console.log("Creating enemy");
         var newEnemy = $.extend(true, {}, enemy);
@@ -26,11 +27,10 @@ this.initialize = function() {
     this.future( 0 ).initializeEnemy();
 }
 
+//Checks to see if there is an unused enemy that can be initialized
 this.findUnusedEnemy = function(){
     var enemies = this.enemies.children;
-    console.log(enemies.length);
     for(var i = 0; i < enemies.length; i++){
-        console.log("Checking if enemy is visible");
         if(enemies[i].visible == false){
             return enemies[i];
         }
@@ -38,15 +38,25 @@ this.findUnusedEnemy = function(){
     return undefined;
 }
 
+//Adds an enemy on the screen every 2 seconds if there are not the max number of enemies
 this.initializeEnemy = function(){
-    console.log("initializing enemy");
-    var newEnemy = this.findUnusedEnemy();
+    var newEnemy = this.findUnusedEnemy(); //Check to see if we can add a new enemy
     if(newEnemy){
         console.log("Found an enemy");
         newEnemy.visible = true;
-        newEnemy.translation = [200, 0, 0];
 
-        console.log("Getting ready to calculate closestPlayer");
+        //Randomize the enemy's starting position between -500 and 500 for x and y
+        var xPos = Math.random() * 500;
+        var yPos = Math.random() * 500;
+        if(Math.random() < 0.5){
+            xPos = xPos * -1;
+        }
+        if(Math.random() < 0.5){
+            yPos = yPos * -1;
+        }
+
+        newEnemy.translation = [xPos, yPos, 0];
+
         var closestPlayer = this.calculateClosestPlayer(newEnemy);
         this.calculateEnemyMovement(closestPlayer, newEnemy);
     }
@@ -57,10 +67,12 @@ this.initializeEnemy = function(){
     this.future(2).initializeEnemy();
 }
 
+//Returns a list of all of the players currently connected
 this.findPlayers = function() {
     return this.find("./element(*,'http://vwf.example.com/navigable.vwf')");
 }
 
+//Finds the closest player to an enemy
 this.calculateClosestPlayer = function(enemy){
     console.log("Calculating closest player.");
     var closestPlayer;
@@ -80,7 +92,6 @@ this.calculateClosestPlayer = function(enemy){
                 closestPlayer = listOfPlayers[i];
             }
         }
-        console.log("Found closest player");
         return closestPlayer;
     }
     return undefined;
@@ -135,6 +146,5 @@ this.calculateEnemyMovement = function(closestPlayer, enemy) {
             }   
         }
     }
-
-    this.future( 1.0/60.0 ).calculateEnemyMovement(closestPlayer, enemy);
+    this.future( 1.0/30.0 ).calculateEnemyMovement(closestPlayer, enemy);
 }

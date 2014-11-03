@@ -17,7 +17,6 @@ properties:
       color: 
       navmode: walk
       lookmode: none
-      translation: [250, 0, 0]
     children:
       camera:
         extends: http://vwf.example.com/camera.vwf
@@ -51,7 +50,6 @@ properties:
           else if(myTranslation[1] < -1000){
             myTranslation[1] = -1000;
           }
-          console.log("x: " + myTranslation[0] + " y: " + myTranslation[1]);
         }
         //@ sourceURL=transformedChanged.vwf    
 methods:
