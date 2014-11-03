@@ -1,6 +1,7 @@
 --- 
 extends: http://vwf.example.com/scene.vwf
 properties:
+<<<<<<< HEAD
   ambientColor: [255, 255, 255]
   moveSpeed: 1.0
   makeOwnAvatarVisible: true
@@ -16,6 +17,19 @@ properties:
       #color: 
       navmode: walk
       lookmode: none
+=======
+  # keyPressInfo:
+  makeOwnAvatarVisible: true
+  moveSpeed: 2.5
+  usersShareView: false
+  userObject:
+    extends: player.vwf
+    implements: [ "http://vwf.example.com/navigable.vwf" ]
+    properties:
+      translationSpeed: 1000
+      color: 
+      navmode: walk
+>>>>>>> ab58ac381caf37e2e27b00e3455570c0ecbb769c
       translation: [250, 0, 0]
     children:
       camera:
@@ -27,6 +41,7 @@ properties:
           near: 1
       avatar:
         extends: http://vwf.example.com/node3.vwf
+<<<<<<< HEAD
         source: ball.dae
         type: model/vnd.collada+xml
         children:
@@ -53,6 +68,14 @@ properties:
           console.log("x: " + myTranslation[0] + " y: " + myTranslation[1]);
         }
         //@ sourceURL=transformedChanged.vwf    
+=======
+        source: SlothCubert2.dae
+        properties:
+          rotation: [-1, 0, 0, 90]
+          translation: [230, -15, 0]
+          scale: 4
+              
+>>>>>>> ab58ac381caf37e2e27b00e3455570c0ecbb769c
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
@@ -60,6 +83,7 @@ children:
     properties:
       xPos: 0
       yPos: 0
+<<<<<<< HEAD
   enemy:
     extends: http://vwf.example.com/node3.vwf
     source: SlothTrans.dae
@@ -76,10 +100,34 @@ methods:
   calculateClosestPlayer:
   enemyHitsPlayer:
   playerDied:
+=======
+  light:
+    extends: http://vwf.example.com/light.vwf
+    properties:
+      distance: 2000
+      translation: [ 400, -400, 900 ]
+  enemy:
+    extends: http://vwf.example.com/node3.vwf
+    source: ball.dae
+    children:
+      material:
+        extends: http://vwf.example.com/material.vwf
+        properties:
+          color: "#ff3333"
+    properties:
+      translation: [ 125, 0, 0 ]
+
+methods:
+  initializeCamera:
+  initializeEnemy:
+  calculateEnemyMovement:
+  calculateClosestPlayer:
+>>>>>>> ab58ac381caf37e2e27b00e3455570c0ecbb769c
   findPlayers:
 scripts:
 - |
     this.initialize = function() {
+<<<<<<< HEAD
       this.future( 0 ).initializeEnemy();
     }
 
@@ -87,11 +135,33 @@ scripts:
       var closestPlayer = this.calculateClosestPlayer();
       this.calculateEnemyMovement(closestPlayer);
     }
+=======
+      this.future( 0 ).initializeCamera();
+      this.future( 0 ).initializeEnemy();
+    }
+
+    this.initializeCamera = function() {
+      this.camera.translation = [ 250, 0, 600 ];
+      this.camera.rotation = [ 1, 0, 0, -90 ];
+>>>>>>> ab58ac381caf37e2e27b00e3455570c0ecbb769c
 
     this.findPlayers = function() {
       return this.find("./element(*,'http://vwf.example.com/navigable.vwf')");
     }
 
+<<<<<<< HEAD
+=======
+    this.initializeEnemy = function(){
+      var closestPlayer = this.calculateClosestPlayer();
+      this.calculateEnemyMovement(closestPlayer);
+    }
+
+    this.findPlayers = function() {
+      console.log(this.find("./element(*,'http://vwf.example.com/navigable.vwf')"));
+      return this.find("./element(*,'http://vwf.example.com/navigable.vwf')");
+    }
+
+>>>>>>> ab58ac381caf37e2e27b00e3455570c0ecbb769c
     this.calculateClosestPlayer = function(){
       var closestPlayer;
       var currentDistance;
@@ -115,6 +185,7 @@ scripts:
       return undefined;
     }
 
+<<<<<<< HEAD
     this.enemyHitsPlayer = function (closestPlayer){
       closestPlayer.health = closestPlayer.health - 1;
       if(closestPlayer.health <= 0){
@@ -168,3 +239,38 @@ scripts:
       this.future( 1.0/60.0 ).calculateEnemyMovement(closestPlayer);
     }
 
+=======
+    this.calculateEnemyMovement = function(closestPlayer) {
+      if(!closestPlayer){
+        closestPlayer = this.calculateClosestPlayer();
+      }
+      else{
+        var xDistance = this.enemy.translation[0] - closestPlayer.translation[0];
+        var yDistance = this.enemy.translation[1] - closestPlayer.translation[1];
+
+        //Checks to see if the enemy needs to move
+        if(xDistance != 0 || yDistance != 0){
+          //Checks what direction it needs to move in
+          if(Math.abs(xDistance) > Math.abs(yDistance)){
+            if(xDistance < 0){
+              this.enemy.translateBy([this.moveSpeed, 0, 0]);
+            }
+            else{
+              this.enemy.translateBy([-this.moveSpeed, 0 ,0]);
+            }
+          }
+          else{
+            if(yDistance < 0){
+              this.enemy.translateBy([0, this.moveSpeed, 0]);
+            }
+            else{
+              this.enemy.translateBy([0, -this.moveSpeed, 0]);
+            }
+          }   
+        }
+      }
+
+      this.future( 1.0/60.0 ).calculateEnemyMovement(closestPlayer);
+    }
+
+>>>>>>> ab58ac381caf37e2e27b00e3455570c0ecbb769c
