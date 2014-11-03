@@ -2,6 +2,7 @@
 extends: http://vwf.example.com/scene.vwf
 properties:
   ambientColor: [255, 255, 255]
+  enemyCount: 0
   moveSpeed: 1.0
   makeOwnAvatarVisible: true
   usersShareView: false
@@ -60,6 +61,7 @@ methods:
   enemyHitsPlayer:
   playerDied:
   findPlayers:
+  findUnusedEnemy:
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
@@ -74,18 +76,8 @@ children:
       xPos: 0
       yPos: 0
       scale: 1000000
-  enemy:
+  enemies:
     extends: http://vwf.example.com/node3.vwf
-    source: ball.dae
-    children:
-      material:
-        extends: http://vwf.example.com/material.vwf
-        properties:
-          color: "#ff0000"
-    properties:
-      translation: [ 0, 0, 0 ]
-      #rotation: [-1, 0 , 0 , 90]
-      #scale: 4 
 scripts:
 - source: "index-model.js"
     
