@@ -1,105 +1,176 @@
 --- 
 extends: http://vwf.example.com/scene.vwf
 properties:
-  keyPressInfo:
-  moveSpeed: 2.5
-  topBoundry: 120
-  leftBoundry: -200
-  rightBoundry: 200
-  bottomBoundry: -120
+  ambientColor: [255, 255, 255]
+  moveSpeed: 1.0
+  makeOwnAvatarVisible: true
+  usersShareView: false
+  userObject:
+    extends: http://vwf.example.com/node3.vwf
+    implements: [ "http://vwf.example.com/navigable.vwf" ]
+    properties:
+      translationSpeed: 100
+      rotationSpeed: 0
+      health: 100
+      numTimesDead: 0
+      color: 
+      navmode: walk
+      lookmode: none
+      translation: [250, 0, 0]
+    children:
+      camera:
+        extends: http://vwf.example.com/camera.vwf
+        properties:
+          translation: [ 250, 0, 600 ]
+          rotation: [1, 0, 0, -90]
+          far: 1000000
+          near: 1
+      avatar:
+        extends: http://vwf.example.com/node3.vwf
+        source: ball.dae
+        type: model/vnd.collada+xml
+        children:
+          material:
+            extends: http://vwf.example.com/material.vwf
+            properties:
+              color: "#00ffff"
+    scripts:
+    - |
+        this.transformChanged = function (){
+          var myTranslation = this.translation;
+          if(myTranslation[0] > 1000){
+            myTranslation[0] = 1000;
+          }
+          else if(myTranslation[0] < -1000){
+            myTranslation[0] = -1000;
+          }
+          if(myTranslation[1] > 1000){
+            myTranslation[1] = 1000;
+          }
+          else if(myTranslation[1] < -1000){
+            myTranslation[1] = -1000;
+          }
+          console.log("x: " + myTranslation[0] + " y: " + myTranslation[1]);
+        }
+        //@ sourceURL=transformedChanged.vwf    
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
     source: board.dae
-    properties:
-      xPos: 0
-      yPos: 0
-  playerOne:
-    extends: http://vwf.example.com/node3.vwf
-    source: ball.dae
-    properties:
-      xPos: 0
-      yPos: 0
     children:
-      playerOneMaterial:
+      material:
         extends: http://vwf.example.com/material.vwf
         properties:
-          color: "#0000ff"
-  light:
-    extends: http://vwf.example.com/light.vwf
+          color: "#ffffff"
+          texture: "sloth2.png"  
     properties:
-      distance: 2000
-      translation: [ 400, -400, 900 ]
+      xPos: 0
+      yPos: 0
+      scale: 1000000
+  enemy:
+    extends: http://vwf.example.com/node3.vwf
+    source: SlothCubert2.dae
+    properties:
+      translation: [ 0, 0, 0 ]
+      rotation: [-1, 0 , 0 , 90]
+      scale: 4 
+events:
+  keyDown:
 methods:
-  initializeCamera:
-  update:
-  movePlayer:
+  initializeEnemy:
+  calculateEnemyMovement:
+  calculateClosestPlayer:
+  enemyHitsPlayer:
+  playerDied:
+  findPlayers:
 scripts:
 - |
     this.initialize = function() {
-
-      this.future( 0 ).initializeCamera();
-      this.future( 0 ).update();
+      this.future( 0 ).initializeEnemy();
     }
-    this.initializeCamera = function() {
-      this.camera.translation = [ 250, 0, 600 ];
-      this.camera.rotation = [ 1, 0, 0, -90 ];
 
-      // Disable navigation
-      this.camera.touchmode = "none";
-      this.camera.navmode = "none";
+    this.initializeEnemy = function(){
+      var closestPlayer = this.calculateClosestPlayer();
+      this.calculateEnemyMovement(closestPlayer);
     }
-    this.update = function() {
-      if ( this.keyPressInfo ) {
-        for ( var keyPress in this.keyPressInfo.keysDown ) {
-          switch( keyPress ) {
-            case 'W':
-              this.movePlayer(this.playerOne, 'U');
-              break;
-            case 'A':
-              this.movePlayer(this.playerOne, 'L');
-              break;
-            case 'S':
-              this.movePlayer(this.playerOne, 'D');
-              break;
-            case 'D':
-              this.movePlayer(this.playerOne, 'R');
-              break;
-            default:
-              break;
+
+    this.findPlayers = function() {
+      return this.find("./element(*,'http://vwf.example.com/navigable.vwf')");
+    }
+
+    this.calculateClosestPlayer = function(){
+      var closestPlayer;
+      var currentDistance;
+      var shortestDistance = 99999;
+      var xDistance, yDistance;
+      var listOfPlayers = this.findPlayers();
+
+      if(listOfPlayers){
+        for(var i = 0; i < listOfPlayers.length; i++){
+          xDistance = this.enemy.translation[0] - listOfPlayers[i].translation[0];
+          yDistance = this.enemy.translation[1] - listOfPlayers[i].translation[1];
+
+          currentDistance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2))
+          if(currentDistance < shortestDistance){
+            shortestDistance = currentDistance;
+            closestPlayer = listOfPlayers[i];
           }
         }
+        return closestPlayer;
       }
-      this.future( 1.0/60.0 ).update();  // schedule the next step
+      return undefined;
     }
 
-    this.movePlayer = function( player, direction ) {
-      switch( direction ) {
-        case 'U':
-          if(player.translation[1] + this.moveSpeed <= 150){
-            player.translateBy( [0, this.moveSpeed, 0]);
-          }
-          break;
-        case 'L':
-          if(player.translation[0] + (-1 * this.moveSpeed) >= -250){
-            player.translateBy( [(-1 * this.moveSpeed), 0, 0]);
-          }
-          break;
-        case 'D':
-          if(player.translation[1] + (-1 * this.moveSpeed) >= -150){
-            player.translateBy( [0, (-1 * this.moveSpeed), 0]);  
-          }
-          break;
-        case 'R':
-          if(player.translation[0] + this.moveSpeed <= 250){
-            player.translateBy( [this.moveSpeed, 0, 0]);      
-          }
-          break;
-        default:
-          break;
+    this.enemyHitsPlayer = function (closestPlayer){
+      closestPlayer.health = closestPlayer.health - 1;
+      if(closestPlayer.health <= 0){
+        playerDied(closestPlayer);
       }
+      console.log(closestPlayer.health);  
     }
-    
-    this.keyDown = this.keyUp = function( input ) {
-      this.keyPressInfo = input;
+
+    this.playerDied = function (closestPlayer){
+      closestPlayer.translateTo( [0, 0, 0]);
+      closestPlayer.numTimesDead = closestPlayer.numTimesDead + 1;
+      closestPlayer.health = 100;
+      console.log("A player has been killed");
     }
+
+    this.calculateEnemyMovement = function(closestPlayer) {
+      if(!closestPlayer){
+        closestPlayer = this.calculateClosestPlayer();
+      }
+      else{
+        var xDistance = this.enemy.translation[0] - closestPlayer.translation[0];
+        var yDistance = this.enemy.translation[1] - closestPlayer.translation[1];
+
+        var distance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2))
+
+        //Checks to see if the enemy needs to move
+        if(distance < 10){      
+          this.enemyHitsPlayer(closestPlayer);  
+        }
+        else if(xDistance != 0 || yDistance != 0){
+          //Checks what direction it needs to move in
+          if(Math.abs(xDistance) > Math.abs(yDistance)){
+            if(xDistance < 0){
+              this.enemy.translateBy([this.moveSpeed, 0, 0]);
+            }
+            else{
+              this.enemy.translateBy([-this.moveSpeed, 0 ,0]);
+            }
+          }
+          else{
+            if(yDistance < 0){
+              this.enemy.translateBy([0, this.moveSpeed, 0]);
+            }
+            else{
+              this.enemy.translateBy([0, -this.moveSpeed, 0]);
+            }
+          }   
+        }
+      }
+
+      this.future( 1.0/60.0 ).calculateEnemyMovement(closestPlayer);
+    }
+
