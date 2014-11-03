@@ -1,8 +1,11 @@
 //Creates the enemy object
 var enemy = {
   extends: "http://vwf.example.com/node3.vwf",
-  source: "ball.dae",
+  source: "SlothTrans.dae",
   properties: {
+    rotation: [-1, 0 , 0 , 90],
+    alpha: 0,
+    scale: 4,
     enabled: true,
     visible: false
   },
