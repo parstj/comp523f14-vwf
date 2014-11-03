@@ -1,25 +1,46 @@
 //Creates the enemy object
 var enemy = {
-  extends: "http://vwf.example.com/node3.vwf",
-  source: "SlothTrans.dae",
-  properties: {
-    rotation: [-1, 0 , 0 , 90],
-    alpha: 0,
-    scale: 4,
-    enabled: true,
-    visible: false
-  },
-  children: {
-    material: {
-      extends: "http://vwf.example.com/material.vwf",
-      properties: {
-        color: "#ff0000"
-      }
+    extends: "http://vwf.example.com/node3.vwf",
+    source: "SlothTrans.dae",
+    properties: {
+        rotation: [-1, 0 , 0 , 90],
+        alpha: 0,
+        scale: 4,
+        enabled: true,
+        visible: false
+    },
+    children: {
+        material: {
+            extends: "http://vwf.example.com/material.vwf",
+            properties: {
+                color: "#ff0000"
+            }
+        }
     }
-  }
+};
+
+var aBullet = {
+    extends: "http://vwf.example.com/node3.vwf",
+    source: "ball.dae",
+    properties: {
+        enabled: false,
+        bulletDirection: [10, 10, 0],
+        translation: [0, 0, 0 ],
+        scale: 0.5,
+    },
+    children: {
+        material: {
+            extends: "http://vwf.example.com/material.vwf",
+            properties: {
+                color: "#ff0000",
+            },
+        },
+    },
 };
 
 this.initialize = function() {
+    this.future( 0 ).initializeBullets();
+
     //Creates a list of unused enemies for use by the program
     for(var i = 0; i < 10; i++ ){
         console.log("Creating enemy");
@@ -39,6 +60,14 @@ this.findUnusedEnemy = function(){
         }
     }
     return undefined;
+}
+
+this.initializeBullets = function(){
+    for(var i = 0; i < 50; i++){
+        this.bullet.children.create("Bullet"+this.bulletCount, aBullet);
+        console.log(this.bulletCount);
+        this.bulletCount++;
+    }
 }
 
 //Adds an enemy on the screen every 2 seconds if there are not the max number of enemies
@@ -151,3 +180,27 @@ this.calculateEnemyMovement = function(closestPlayer, enemy) {
     }
     this.future( 1.0/30.0 ).calculateEnemyMovement(closestPlayer, enemy);
 }
+
+this.pointerClick = function( input ) {
+    var pi = input;
+    console.log(input.globalPosition);
+    var playerPlace = this.findPlayers()[0].translation;
+    var listOfBullets = this.bullet.children;
+    var coolBullet;
+    var test = true;
+    var i = 0;
+    while(test){
+        if(listOfBullets[i].enabled==false){
+            coolBullet = listOfBullets[i];
+            coolBullet.enabled = true;
+            test = false;
+        }
+        i++;
+        
+        if(i>listOfBullets.length){
+            test = false;
+        }
+    }
+    //coolBullet.translateTo([playerPlace[0]+120,playerPlace[1],0]);
+    coolBullet.translateTo([input.globalPosition[0]-121,input.globalPosition[1],0]);
+}//@ sourceURL=index.vwf.yaml

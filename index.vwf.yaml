@@ -3,6 +3,7 @@ extends: http://vwf.example.com/scene.vwf
 properties:
   ambientColor: [255, 255, 255]
   enemyCount: 0
+  bulletCount: 0
   moveSpeed: 1.0
   makeOwnAvatarVisible: true
   usersShareView: false
@@ -52,13 +53,14 @@ properties:
         }
         //@ sourceURL=transformedChanged.vwf    
 methods:
-  initializeEnemy:
   calculateEnemyMovement:
   calculateClosestPlayer:
   enemyHitsPlayer:
-  playerDied:
   findPlayers:
   findUnusedEnemy:
+  initializeBullets:
+  initializeEnemy:
+  playerDied:
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
@@ -69,14 +71,6 @@ children:
       scale: 1000000
   enemies:
     extends: http://vwf.example.com/node3.vwf
-methods:
-  calculateEnemyMovement:
-  calculateClosestPlayer:
-  enemyHitsPlayer:
-  findPlayers:
-  findUnusedEnemy:
-  initializeEnemy:
-  playerDied:
 scripts:
 - source: "index-model.js"
     
