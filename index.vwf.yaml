@@ -14,7 +14,6 @@ properties:
       rotationSpeed: 0
       health: 100
       numTimesDead: 0
-      color: 
       navmode: walk
       lookmode: none
     children:
@@ -63,19 +62,21 @@ methods:
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
-    source: board.dae
-    children:
-      material:
-        extends: http://vwf.example.com/material.vwf
-        properties:
-          color: "#ffffff"
-          texture: "sloth2.png"  
+    source: boardlarge.dae 
     properties:
       xPos: 0
       yPos: 0
       scale: 1000000
   enemies:
     extends: http://vwf.example.com/node3.vwf
+methods:
+  calculateEnemyMovement:
+  calculateClosestPlayer:
+  enemyHitsPlayer:
+  findPlayers:
+  findUnusedEnemy:
+  initializeEnemy:
+  playerDied:
 scripts:
 - source: "index-model.js"
     
