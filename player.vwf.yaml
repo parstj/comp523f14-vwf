@@ -1,0 +1,69 @@
+---
+extends: http://vwf.example.com/node3.vwf
+properties:
+	moveSpeed: 2.5
+methods:
+  update:
+  movePlayer:
+events:
+  keyDown:
+scripts:
+- |
+    this.update = function(input) {
+      debugger;
+      if ( input ) {
+        switch( input ) {
+          case 'W':
+            this.movePlayer('U');
+            break;
+          case 'A':
+            this.movePlayer('L');
+            break;
+          case 'S':
+            this.movePlayer('D');
+            break;
+          case 'D':
+            this.movePlayer('R');
+            break;
+          default:
+            break;
+        }
+      }
+    }
+
+    this.movePlayer = function( direction ) {
+      switch( direction ) {
+        case 'U':
+          //Checks to see if the player collides with the end of the board
+          if(translation[1] + this.moveSpeed <= 150){
+            translateBy( [0, this.moveSpeed, 0]);
+          }
+          break;
+        case 'L':
+          //Checks to see if the player collides with the end of the board
+          if(translation[0] + (-1 * this.moveSpeed) >= -250){
+            translateBy( [(-1 * this.moveSpeed), 0, 0]);
+          }
+          break;
+        case 'D':
+          //Checks to see if the player collides with the end of the board
+          if(translation[1] + (-1 * this.moveSpeed) >= -150){
+            translateBy( [0, (-1 * this.moveSpeed), 0]);  
+          }
+          break;
+        case 'R':
+          //Checks to see if the player collides with the end of the board
+          if(translation[0] + this.moveSpeed <= 250){
+            translateBy( [this.moveSpeed, 0, 0]);      
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    
+    this.keyDown = function( input ) {
+      this.update(input);
+    }
+
+    //@ sourceURL=player.vwf

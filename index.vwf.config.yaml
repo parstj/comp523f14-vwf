@@ -1,0 +1,8 @@
+---
+info:
+  title: Escape from Sloth Island
+model:
+  vwf/model/threejs:
+view:
+  vwf/view/threejs: "#vwf-root"
+  vwf/view/editor:
