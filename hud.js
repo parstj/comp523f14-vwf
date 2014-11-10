@@ -1,12 +1,12 @@
 var userNodeID;
 
 vwf_view.satProperty = function(nodeId, propertyName, propertyValue){
-	if(nodeId == userNodeID){
+//	if(nodeId == userNodeID){
 		switch(propertyName){
 			case "health":
-				alert(propertyValue);
+				//alert(propertyValue);
 		}
-	}
+//	}
 };
 
 vwf_view.initializedNode = function(nodeID, childID, childExtendsID, childImplementsIDs,

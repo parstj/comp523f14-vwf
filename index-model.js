@@ -17,6 +17,8 @@ var aBullet = {
     source: "ball.dae",
     properties: {
         enabled: false,
+        xPos: 0,
+        yPos: 0,
         xSpeed: 0,
         ySpeed: 0,
         Speed: 10,
@@ -35,7 +37,7 @@ var aBullet = {
 
 this.initialize = function() {
     this.future( 0 ).initializeBullets();
-    //this.future( 0 ).initializeEnemy();
+    this.future( 0 ).initializeEnemy();
     this.future( 0 ).createEnemy();
 }
 
@@ -159,6 +161,14 @@ this.calculateEnemyMovement = function(closestPlayer, enemy) {
         }
     }
     this.future( 1/30 ).calculateEnemyMovement(closestPlayer, enemy);
+}
+
+this.checkIfHitEnemy = function(bullet){
+    // for(var i = 0; i < enemies.length; i++){
+    //     if(enemies[i].visible === true){
+    //         if(bullet);
+    //     }
+    // }   
 }
 
 this.enemyHitsPlayer = function (closestPlayer, enemy){

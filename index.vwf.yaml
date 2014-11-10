@@ -55,6 +55,7 @@ properties:
 methods:
   calculateEnemyMovement:
   calculateClosestPlayer:
+  checkIfHitEnemy: 
   createEnemy: 
   destroyEnemy: 
   enemyHitsPlayer:
