@@ -1,8 +1,18 @@
-vwf_view.satProperty = function(nodeId, propertyName, propertyValye){
-	if(nodeId == "navobj_" + vwf.moniker()){
+var userNodeID;
+
+vwf_view.satProperty = function(nodeId, propertyName, propertyValue){
+	if(nodeId == userNodeID){
 		switch(propertyName){
 			case "health":
-				alert("Your health has changed");
+				alert(propertyValue);
 		}
 	}
-}
+};
+
+vwf_view.initializedNode = function(nodeID, childID, childExtendsID, childImplementsIDs,
+            childSource, childType, childIndex, childName, callback) {
+    var navObjectName = this.kernel.moniker();
+    if ( childName == navObjectName ) {
+    	userNodeID = nodeID;
+    }
+};

@@ -42,7 +42,6 @@ this.initialize = function() {
 this.initializeBullets = function(){
     for(var i = 0; i < 50; i++){
         this.bullet.children.create("Bullet"+this.bulletCount, aBullet);
-        console.log(this.bulletCount);
         this.bulletCount++;
     }
 }
@@ -50,7 +49,6 @@ this.initializeBullets = function(){
 this.initializeEnemy = function() {
     //Creates a list of unused enemies for use by the program
     for(var i = 0; i < 10; i++ ){
-        console.log("Creating enemy");
         var newEnemy = $.extend(true, {}, enemy);
         this.enemies.children.create("Enemy"+this.enemyCount, newEnemy);
         this.enemyCount += 1;
@@ -61,7 +59,6 @@ this.initializeEnemy = function() {
 this.createEnemy = function(){
     var newEnemy = this.findUnusedEnemy(); //Check to see if we can add a new enemy
     if(newEnemy){
-        console.log("Found an enemy");
         newEnemy.visible = true;
 
         //Randomize the enemy's starting position between -500 and 500 for x and y
@@ -78,9 +75,6 @@ this.createEnemy = function(){
 
         var closestPlayer = this.calculateClosestPlayer(newEnemy);
         this.calculateEnemyMovement(closestPlayer, newEnemy);
-    }
-    else{
-        console.log("Could not find an enemy to use");
     }
 
     this.future(2).createEnemy();
@@ -108,7 +102,6 @@ this.findUnusedEnemy = function(){
 
 //Finds the closest player to an enemy
 this.calculateClosestPlayer = function(enemy){
-    console.log("Calculating closest player.");
     var closestPlayer;
     var currentDistance;
     var shortestDistance = 99999;
@@ -173,14 +166,12 @@ this.enemyHitsPlayer = function (closestPlayer, enemy){
     if(closestPlayer.health <= 0){
         this.playerDied(closestPlayer);
     }
-    console.log(closestPlayer.health);  
 }
 
 this.playerDied = function (closestPlayer){
     closestPlayer.translateTo( [0, 0, 0]);
     closestPlayer.numTimesDead = closestPlayer.numTimesDead + 1;
     closestPlayer.health = 100;
-    console.log("A player has been killed");
 }
 
 this.moveBullet = function( bullet ){
