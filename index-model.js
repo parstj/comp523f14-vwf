@@ -9,16 +9,9 @@ var enemy = {
         enabled: true,
         visible: false
     },
-    children: {
-        material: {
-            extends: "http://vwf.example.com/material.vwf",
-            properties: {
-                color: "#ff0000"
-            }
-        }
-    }
 };
 
+//Creates the bullet object
 var aBullet = {
     extends: "http://vwf.example.com/node3.vwf",
     source: "ball.dae",
@@ -40,26 +33,8 @@ var aBullet = {
 
 this.initialize = function() {
     this.future( 0 ).initializeBullets();
-
-    //Creates a list of unused enemies for use by the program
-    for(var i = 0; i < 10; i++ ){
-        console.log("Creating enemy");
-        var newEnemy = $.extend(true, {}, enemy);
-        this.enemies.children.create("Enemy"+this.enemyCount, newEnemy);
-        this.enemyCount += 1;
-    }
     this.future( 0 ).initializeEnemy();
-}
-
-//Checks to see if there is an unused enemy that can be initialized
-this.findUnusedEnemy = function(){
-    var enemies = this.enemies.children;
-    for(var i = 0; i < enemies.length; i++){
-        if(enemies[i].visible == false){
-            return enemies[i];
-        }
-    }
-    return undefined;
+    this.future( 0 ).createEnemy();
 }
 
 this.initializeBullets = function(){
@@ -70,8 +45,18 @@ this.initializeBullets = function(){
     }
 }
 
+this.initializeEnemy = function() {
+    //Creates a list of unused enemies for use by the program
+    for(var i = 0; i < 10; i++ ){
+        console.log("Creating enemy");
+        var newEnemy = $.extend(true, {}, enemy);
+        this.enemies.children.create("Enemy"+this.enemyCount, newEnemy);
+        this.enemyCount += 1;
+    }
+}
+
 //Adds an enemy on the screen every 2 seconds if there are not the max number of enemies
-this.initializeEnemy = function(){
+this.createEnemy = function(){
     var newEnemy = this.findUnusedEnemy(); //Check to see if we can add a new enemy
     if(newEnemy){
         console.log("Found an enemy");
@@ -96,12 +81,27 @@ this.initializeEnemy = function(){
         console.log("Could not find an enemy to use");
     }
 
-    this.future(2).initializeEnemy();
+    this.future(2).createEnemy();
+}
+
+this.destroyEnemy = function(enemy){
+    enemy.visible = false;
 }
 
 //Returns a list of all of the players currently connected
 this.findPlayers = function() {
     return this.find("./element(*,'http://vwf.example.com/navigable.vwf')");
+}
+
+//Checks to see if there is an unused enemy that can be initialized
+this.findUnusedEnemy = function(){
+    var enemies = this.enemies.children;
+    for(var i = 0; i < enemies.length; i++){
+        if(enemies[i].visible === false){
+            return enemies[i];
+        }
+    }
+    return undefined;
 }
 
 //Finds the closest player to an enemy
@@ -127,21 +127,6 @@ this.calculateClosestPlayer = function(enemy){
         return closestPlayer;
     }
     return undefined;
-}
-
-this.playerDied = function (closestPlayer){
-    closestPlayer.translateTo( [0, 0, 0]);
-    closestPlayer.numTimesDead = closestPlayer.numTimesDead + 1;
-    closestPlayer.health = 100;
-    console.log("A player has been killed");
-}
-
-this.enemyHitsPlayer = function (closestPlayer, enemy){
-    closestPlayer.health = closestPlayer.health - 1;
-    if(closestPlayer.health <= 0){
-        this.playerDied(closestPlayer);
-    }
-    console.log(closestPlayer.health);  
 }
 
 this.calculateEnemyMovement = function(closestPlayer, enemy) {
@@ -178,7 +163,22 @@ this.calculateEnemyMovement = function(closestPlayer, enemy) {
             }   
         }
     }
-    this.future( 1.0/30.0 ).calculateEnemyMovement(closestPlayer, enemy);
+    this.future( 1/30 ).calculateEnemyMovement(closestPlayer, enemy);
+}
+
+this.enemyHitsPlayer = function (closestPlayer, enemy){
+    closestPlayer.health = closestPlayer.health - 1;
+    if(closestPlayer.health <= 0){
+        this.playerDied(closestPlayer);
+    }
+    console.log(closestPlayer.health);  
+}
+
+this.playerDied = function (closestPlayer){
+    closestPlayer.translateTo( [0, 0, 0]);
+    closestPlayer.numTimesDead = closestPlayer.numTimesDead + 1;
+    closestPlayer.health = 100;
+    console.log("A player has been killed");
 }
 
 this.pointerClick = function( input ) {
@@ -190,7 +190,7 @@ this.pointerClick = function( input ) {
     var test = true;
     var i = 0;
     while(test){
-        if(listOfBullets[i].enabled==false){
+        if(listOfBullets[i].enabled === false){
             coolBullet = listOfBullets[i];
             coolBullet.enabled = true;
             test = false;
@@ -203,4 +203,5 @@ this.pointerClick = function( input ) {
     }
     //coolBullet.translateTo([playerPlace[0]+120,playerPlace[1],0]);
     coolBullet.translateTo([input.globalPosition[0]-121,input.globalPosition[1],0]);
-}//@ sourceURL=index.vwf.yaml
+}
+//@ sourceURL=index-model.js
