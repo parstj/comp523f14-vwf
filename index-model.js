@@ -17,7 +17,9 @@ var aBullet = {
     source: "ball.dae",
     properties: {
         enabled: false,
-        bulletDirection: [10, 10, 0],
+        xSpeed: 0,
+        ySpeed: 0,
+        Speed: 10,
         translation: [0, 0, 0 ],
         scale: 0.5,
     },
@@ -33,7 +35,7 @@ var aBullet = {
 
 this.initialize = function() {
     this.future( 0 ).initializeBullets();
-    this.future( 0 ).initializeEnemy();
+    //this.future( 0 ).initializeEnemy();
     this.future( 0 ).createEnemy();
 }
 
@@ -181,9 +183,20 @@ this.playerDied = function (closestPlayer){
     console.log("A player has been killed");
 }
 
+this.moveBullet = function( bullet ){
+    bullet.translateBy([bullet.xSpeed, bullet.ySpeed, 0]);
+    if(bullet.translation[0] > 1000 || bullet.translation[0] < -1000 || bullet.translation[1] > 1000 || bullet.translation[1] < -1000){
+        bullet.enabled = false;
+        bullet.xSpeed = 0;
+        bullet.ySpeed = 0;
+    }
+    if(bullet.enabled){
+        this.future( 1/30 ).moveBullet(bullet);
+    }
+}
+
 this.pointerClick = function( input ) {
     var pi = input;
-    console.log(input.globalPosition);
     var playerPlace = this.findPlayers()[0].translation;
     var listOfBullets = this.bullet.children;
     var coolBullet;
@@ -201,7 +214,12 @@ this.pointerClick = function( input ) {
             test = false;
         }
     }
-    //coolBullet.translateTo([playerPlace[0]+120,playerPlace[1],0]);
-    coolBullet.translateTo([input.globalPosition[0]-121,input.globalPosition[1],0]);
+    coolBullet.translateTo([playerPlace[0]+120,playerPlace[1],0]);
+    var xDistance = playerPlace[0] + 240 - input.globalPosition[0];
+    var yDistance = playerPlace[1] - input.globalPosition[1];
+    var totalDistance = Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
+    coolBullet.xSpeed = -coolBullet.Speed * (xDistance/totalDistance);
+    coolBullet.ySpeed = -coolBullet.Speed * (yDistance/totalDistance);
+    this.future( 1/30 ).moveBullet(coolBullet);
 }
 //@ sourceURL=index-model.js

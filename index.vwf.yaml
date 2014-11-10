@@ -63,6 +63,7 @@ methods:
   initializeBullets:
   initializeEnemy:
   playerDied:
+  moveBullet:
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
