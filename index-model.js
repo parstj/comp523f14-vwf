@@ -14,6 +14,7 @@ var aBullet = {
     source: "ball.dae",
     properties: {
         enabled: false,
+        visible: false,
         xPos: 0,
         yPos: 0,
         xSpeed: 0,
