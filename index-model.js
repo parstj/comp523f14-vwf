@@ -1,11 +1,8 @@
 //Creates the enemy object
 var enemy = {
     extends: "http://vwf.example.com/node3.vwf",
-    source: "SlothTrans.dae",
+    source: "ball.dae",
     properties: {
-        rotation: [-1, 0 , 0 , 90],
-        alpha: 0,
-        scale: 4,
         enabled: true,
         visible: false
     },
@@ -43,7 +40,8 @@ this.initialize = function() {
 
 this.initializeBullets = function(){
     for(var i = 0; i < 50; i++){
-        this.bullet.children.create("Bullet"+this.bulletCount, aBullet);
+        var newBullet = $.extend(true, {}, aBullet);
+        this.bullet.children.create("Bullet"+this.bulletCount, newBullet);
         this.bulletCount++;
     }
 }
@@ -130,7 +128,7 @@ this.calculateEnemyMovement = function(closestPlayer, enemy) {
     if(!closestPlayer){
         closestPlayer = this.calculateClosestPlayer(enemy);
     }
-    else{
+    else if(enemy.visible === true){
         var xDistance = enemy.translation[0] - closestPlayer.translation[0];
         var yDistance = enemy.translation[1] - closestPlayer.translation[1];
 
@@ -159,16 +157,22 @@ this.calculateEnemyMovement = function(closestPlayer, enemy) {
                 }
             }   
         }
+        this.future( 1/30 ).calculateEnemyMovement(closestPlayer, enemy);
     }
-    this.future( 1/30 ).calculateEnemyMovement(closestPlayer, enemy);
 }
 
 this.checkIfHitEnemy = function(bullet){
-    // for(var i = 0; i < enemies.length; i++){
-    //     if(enemies[i].visible === true){
-    //         if(bullet);
-    //     }
-    // }   
+    var enemies = this.enemies.children;
+    for(var i = 0; i < enemies.length; i++){
+        if(enemies[i].visible === true){
+            if(Math.abs(bullet.translation[0] - enemies[i].translation[0] - 120) < 12 &&
+               Math.abs(bullet.translation[1] - enemies[i].translation[1]) < 12){
+                console.log("I hit an enemy!");
+                enemies[i].visible = false;
+                return true;
+            }    
+        }
+    }   
 }
 
 this.enemyHitsPlayer = function (closestPlayer, enemy){
@@ -188,8 +192,15 @@ this.moveBullet = function( bullet ){
     bullet.translateBy([bullet.xSpeed, bullet.ySpeed, 0]);
     if(bullet.translation[0] > 1000 || bullet.translation[0] < -1000 || bullet.translation[1] > 1000 || bullet.translation[1] < -1000){
         bullet.enabled = false;
+        bullet.visible = false;
         bullet.xSpeed = 0;
         bullet.ySpeed = 0;
+    }
+    if(this.checkIfHitEnemy(bullet) === true){
+        bullet.enabled = false;
+        bullet.visible = false;
+        bullet.xSpeed = 0;
+        bullet.ySpeed = 0;   
     }
     if(bullet.enabled){
         this.future( 1/30 ).moveBullet(bullet);
@@ -207,6 +218,7 @@ this.pointerClick = function( input ) {
         if(listOfBullets[i].enabled === false){
             coolBullet = listOfBullets[i];
             coolBullet.enabled = true;
+            coolBullet.visible = true;
             test = false;
         }
         i++;
@@ -215,7 +227,7 @@ this.pointerClick = function( input ) {
             test = false;
         }
     }
-    coolBullet.translateTo([playerPlace[0]+120,playerPlace[1],0]);
+    coolBullet.translateTo([playerPlace[0] +120,playerPlace[1],0]);
     var xDistance = playerPlace[0] + 240 - input.globalPosition[0];
     var yDistance = playerPlace[1] - input.globalPosition[1];
     var totalDistance = Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
