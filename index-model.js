@@ -3,8 +3,9 @@ var enemy = {
     extends: "http://vwf.example.com/node3.vwf",
     source: "ball.dae",
     properties: {
-        enabled: true,
-        visible: false
+        enabled: false,
+        visible: false,
+        health: 1.0
     },
 };
 
@@ -37,6 +38,8 @@ this.initialize = function() {
     this.future( 0 ).initializeBullets();
     this.future( 0 ).initializeEnemy();
     this.future( 0 ).createEnemy();
+    this.future( 30 ).increaseEnemyMoveSpeed();
+    this.future( 120 ).increaseEnemyHealth();
 }
 
 this.initializeBullets = function(){
@@ -61,6 +64,8 @@ this.createEnemy = function(){
     var newEnemy = this.findUnusedEnemy(); //Check to see if we can add a new enemy
     if(newEnemy){
         newEnemy.visible = true;
+        newEnemy.enabled = true;
+        newEnemy.health = this.healthMultiplier; 
 
         //Randomize the enemy's starting position between -500 and 500 for x and y
         var xPos = Math.random() * 500;
@@ -81,8 +86,16 @@ this.createEnemy = function(){
     this.future(2).createEnemy();
 }
 
-this.destroyEnemy = function(enemy){
-    enemy.visible = false;
+this.increaseEnemyHealth = function(){
+    this.healthMultiplier = this.healthMultiplier + 1;
+    console.log("Increasing health of enemies to: " + this.healthMultiplier);
+    this.future( 120 ).increaseEnemyHealth();
+}
+
+this.increaseEnemyMoveSpeed = function(){
+    this.moveSpeed = this.moveSpeed +0.1;
+    console.log("Increasing enemy moveSpeed to: " + this.moveSpeed);
+    this.future( 30 ).increaseEnemyMoveSpeed();
 }
 
 //Returns a list of all of the players currently connected
@@ -169,7 +182,12 @@ this.checkIfHitEnemy = function(bullet){
             if(Math.abs(bullet.translation[0] - enemies[i].translation[0] - 120) < 12 &&
                Math.abs(bullet.translation[1] - enemies[i].translation[1]) < 12){
                 console.log("I hit an enemy!");
-                enemies[i].visible = false;
+                enemies[i].health = enemies[i].health - 1;
+                console.log("The enemy's health is: " + enemies[i].health);
+                if(enemies[i].health < 1){
+                    enemies[i].visible = false;
+                    enemies[i].enabled = false;
+                } 
                 return true;
             }    
         }

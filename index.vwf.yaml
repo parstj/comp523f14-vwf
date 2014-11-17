@@ -2,8 +2,9 @@
 extends: http://vwf.example.com/scene.vwf
 properties:
   ambientColor: [255, 255, 255]
-  enemyCount: 0
   bulletCount: 0
+  enemyCount: 0
+  healthMultiplier: 1.0
   moveSpeed: 1.0
   makeOwnAvatarVisible: true
   usersShareView: false
@@ -57,10 +58,11 @@ methods:
   calculateClosestPlayer:
   checkIfHitEnemy: 
   createEnemy: 
-  destroyEnemy: 
   enemyHitsPlayer:
   findPlayers:
   findUnusedEnemy:
+  increaseEnemyHealth:
+  increaseEnemyMoveSpeed:
   initializeBullets:
   initializeEnemy:
   playerDied:
