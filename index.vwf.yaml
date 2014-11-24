@@ -4,8 +4,11 @@ properties:
   ambientColor: [255, 255, 255]
   bulletCount: 0
   enemyCount: 0
+  enemiesKilled: 0
   healthMultiplier: 1.0
+  healthMultiplierTimer: 10
   moveSpeed: 1.0
+  moveSpeedTimer: 5
   makeOwnAvatarVisible: true
   usersShareView: false
   userObject:
@@ -74,7 +77,6 @@ children:
     properties:
       xPos: 0
       yPos: 0
-      scale: 1000000
   enemies:
     extends: http://vwf.example.com/node3.vwf
   bullet:

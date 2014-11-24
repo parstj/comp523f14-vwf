@@ -38,15 +38,14 @@ this.initialize = function() {
     this.future( 0 ).initializeBullets();
     this.future( 0 ).initializeEnemy();
     this.future( 0 ).createEnemy();
-    this.future( 30 ).increaseEnemyMoveSpeed();
-    this.future( 120 ).increaseEnemyHealth();
+    this.future( this.healthMultiplierTimer ).increaseEnemyMoveSpeed();
+    this.future( this.moveSpeedTimer ).increaseEnemyHealth();
 }
 
 this.initializeBullets = function(){
     for(var i = 0; i < 50; i++){
         var newBullet = $.extend(true, {}, aBullet);
         this.bullet.children.create("Bullet"+this.bulletCount, newBullet);
-        this.bulletCount++;
     }
 }
 
@@ -55,7 +54,6 @@ this.initializeEnemy = function() {
     for(var i = 0; i < 10; i++ ){
         var newEnemy = $.extend(true, {}, enemy);
         this.enemies.children.create("Enemy"+this.enemyCount, newEnemy);
-        this.enemyCount += 1;
     }
 }
 
@@ -81,6 +79,8 @@ this.createEnemy = function(){
 
         var closestPlayer = this.calculateClosestPlayer(newEnemy);
         this.calculateEnemyMovement(closestPlayer, newEnemy);
+
+        this.enemyCount++;
     }
 
     this.future(2).createEnemy();
@@ -89,13 +89,13 @@ this.createEnemy = function(){
 this.increaseEnemyHealth = function(){
     this.healthMultiplier = this.healthMultiplier + 1;
     console.log("Increasing health of enemies to: " + this.healthMultiplier);
-    this.future( 120 ).increaseEnemyHealth();
+    this.future( this.healthMultiplierTimer ).increaseEnemyHealth();
 }
 
 this.increaseEnemyMoveSpeed = function(){
     this.moveSpeed = this.moveSpeed +0.1;
     console.log("Increasing enemy moveSpeed to: " + this.moveSpeed);
-    this.future( 30 ).increaseEnemyMoveSpeed();
+    this.future( this.moveSpeedTimer ).increaseEnemyMoveSpeed();
 }
 
 //Returns a list of all of the players currently connected
@@ -187,6 +187,8 @@ this.checkIfHitEnemy = function(bullet){
                 if(enemies[i].health < 1){
                     enemies[i].visible = false;
                     enemies[i].enabled = false;
+                    this.enemyCount--;
+                    this.enemiesKilled++;
                 } 
                 return true;
             }    
