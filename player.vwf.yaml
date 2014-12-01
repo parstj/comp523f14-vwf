@@ -1,0 +1,95 @@
+---
+extends: http://vwf.example.com/node3.vwf
+properties:
+	moveSpeed: 2.5
+	id: null
+	translation: [0, 0, 0]
+methods:
+  initializeCamera:
+  update:
+  movePlayer:
+  pointerDown:
+scripts:
+- |
+
+    var fireTime = 0;
+
+    this.initialize = function() {
+      this.id = this.client;
+      this.future( 0 ).initializeCamera();
+      this.future( 0 ).update();
+    }
+
+    this.initializeCamera = function() {
+      this.camera.translation = [ 250, 0, 600 ];
+      this.camera.rotation = [ 1, 0, 0, -90 ];
+
+      // Disable navigation
+      this.camera.touchmode = "none";
+      this.camera.navmode = "none";
+
+    }
+
+    this.update = function() {
+
+      this.fireTime = this.fireTime - 1;
+      /* if ( this.keyPressInfo ) {
+        for ( var keyPress in this.keyPressInfo.keysDown ) {
+          switch( keyPress ) {
+            case 'W':
+              this.movePlayer('U');
+              break;
+            case 'A':
+              this.movePlayer('L');
+              break;
+            case 'S':
+              this.movePlayer('R');
+              break;
+            case 'D':
+              this.movePlayer('D');
+              break;
+            default:
+              break;
+          }
+        }
+      } */
+
+
+      this.future( 1.0/60.0 ).update();  // schedule the next step
+    }
+
+    this.movePlayer = function( direction ) {
+      switch( direction ) {
+        case 'U':
+          //Checks to see if the player collides with the end of the board
+          if(translation[1] + this.moveSpeed <= 150){
+            translateBy( [0, this.moveSpeed, 0]);
+          }
+          break;
+        case 'L':
+          //Checks to see if the player collides with the end of the board
+          if(translation[0] + (-1 * this.moveSpeed) >= -250){
+            translateBy( [(-1 * this.moveSpeed), 0, 0]);
+          }
+          break;
+        case 'D':
+          //Checks to see if the player collides with the end of the board
+          if(translation[1] + (-1 * this.moveSpeed) >= -150){
+            translateBy( [0, (-1 * this.moveSpeed), 0]);  
+          }
+          break;
+        case 'R':
+          //Checks to see if the player collides with the end of the board
+          if(translation[0] + this.moveSpeed <= 250){
+            translateBy( [this.moveSpeed, 0, 0]);      
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    
+    this.keyDown = this.keyUp = function( input ) {
+      console.log("Fuck");
+      this.keyPressInfo = input;
+    }

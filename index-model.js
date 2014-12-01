@@ -1,13 +1,21 @@
-//Creates the enemy object
 var enemy = {
     extends: "http://vwf.example.com/node3.vwf",
-    source: "ball.dae",
+    source: "ball3.dae",
     properties: {
         enabled: false,
         visible: false,
         health: 1.0
     },
+    children: {
+        material: {
+          extends: "http://vwf.example.com/material.vwf",
+          properties:{
+            color: "#dd5511"
+          }
+        }
+    }
 };
+
 
 //Creates the bullet object
 var aBullet = {
@@ -16,8 +24,8 @@ var aBullet = {
     properties: {
         enabled: false,
         visible: false,
-        xPos: 0,
-        yPos: 0,
+        xPos: -2000,
+        yPos: -2000,
         xSpeed: 0,
         ySpeed: 0,
         Speed: 10,
@@ -38,14 +46,15 @@ this.initialize = function() {
     this.future( 0 ).initializeBullets();
     this.future( 0 ).initializeEnemy();
     this.future( 0 ).createEnemy();
-    this.future( this.healthMultiplierTimer ).increaseEnemyMoveSpeed();
-    this.future( this.moveSpeedTimer ).increaseEnemyHealth();
+    this.future( 30 ).increaseEnemyMoveSpeed();
+    this.future( 120 ).increaseEnemyHealth();
 }
 
 this.initializeBullets = function(){
     for(var i = 0; i < 50; i++){
         var newBullet = $.extend(true, {}, aBullet);
         this.bullet.children.create("Bullet"+this.bulletCount, newBullet);
+        this.bulletCount++;
     }
 }
 
@@ -54,8 +63,11 @@ this.initializeEnemy = function() {
     for(var i = 0; i < 10; i++ ){
         var newEnemy = $.extend(true, {}, enemy);
         this.enemies.children.create("Enemy"+this.enemyCount, newEnemy);
+        this.enemyCount += 1;
     }
 }
+
+
 
 //Adds an enemy on the screen every 2 seconds if there are not the max number of enemies
 this.createEnemy = function(){
@@ -75,29 +87,25 @@ this.createEnemy = function(){
             yPos = yPos * -1;
         }
 
-        //Place the enemy on the board
         newEnemy.translation = [xPos, yPos, 0];
 
-        //Find the closest player to the enemy and start moving towards it
         var closestPlayer = this.calculateClosestPlayer(newEnemy);
         this.calculateEnemyMovement(closestPlayer, newEnemy);
-
-        this.enemyCount++;
     }
 
     this.future(2).createEnemy();
 }
 
-//Increases the enemy's health by 1 after a set period of time
 this.increaseEnemyHealth = function(){
     this.healthMultiplier = this.healthMultiplier + 1;
-    this.future( this.healthMultiplierTimer ).increaseEnemyHealth();
+    console.log("Increasing health of enemies to: " + this.healthMultiplier);
+    this.future( 120 ).increaseEnemyHealth();
 }
 
-//Increases the enemy's movement speed by 0.1 after a set period of time
 this.increaseEnemyMoveSpeed = function(){
     this.moveSpeed = this.moveSpeed +0.1;
-    this.future( this.moveSpeedTimer ).increaseEnemyMoveSpeed();
+    console.log("Increasing enemy moveSpeed to: " + this.moveSpeed);
+    this.future( 30 ).increaseEnemyMoveSpeed();
 }
 
 //Returns a list of all of the players currently connected
@@ -117,7 +125,6 @@ this.findUnusedEnemy = function(){
 }
 
 //Finds the closest player to an enemy
-//Returns the closest player to the object, undefined otherwise
 this.calculateClosestPlayer = function(enemy){
     var closestPlayer;
     var currentDistance;
@@ -178,23 +185,18 @@ this.calculateEnemyMovement = function(closestPlayer, enemy) {
     }
 }
 
-//Takes a bullet and checks each enemy to see if it is close enough to register a hit
-//Returns true if it hit an enemy, false otherwise
 this.checkIfHitEnemy = function(bullet){
     var enemies = this.enemies.children;
-    //Interates through the list of all enimies
     for(var i = 0; i < enemies.length; i++){
         if(enemies[i].visible === true){
-            //Check to see if the bullet hit an enemy
-            if(Math.abs(bullet.translation[0] - enemies[i].translation[0] - 120) < this.distanceForCollision &&
-               Math.abs(bullet.translation[1] - enemies[i].translation[1]) < this.distanceForCollision){
+            if(Math.abs(bullet.translation[0] - enemies[i].translation[0] - 120) < 12 &&
+               Math.abs(bullet.translation[1] - enemies[i].translation[1]) < 12){
+                console.log("I hit an enemy!");
                 enemies[i].health = enemies[i].health - 1;
-                //If the enemy's health drops below 1, disable it
+                console.log("The enemy's health is: " + enemies[i].health);
                 if(enemies[i].health < 1){
                     enemies[i].visible = false;
                     enemies[i].enabled = false;
-                    this.enemyCount--;
-                    this.enemiesKilled++;
                 } 
                 return true;
             }    
@@ -234,9 +236,34 @@ this.moveBullet = function( bullet ){
     }
 }
 
+
+this.fire = function( newBull, playerPlace, globalPosition, thePlayer) {
+    newBull.translateTo([playerPlace[0] +120,playerPlace[1],0]);
+    newBull.visible = true;
+    var xDistance = playerPlace[0] + 240 - globalPosition[0];
+    var yDistance = playerPlace[1] - globalPosition[1];
+    var totalDistance = Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
+    newBull.xSpeed = -newBull.Speed * (xDistance/totalDistance);
+    newBull.ySpeed = -newBull.Speed * (yDistance/totalDistance);
+    //thePlayer.fireTime = 25;
+    this.future( 1/30 ).moveBullet(newBull);
+}
+
 this.pointerClick = function( input ) {
+    var players = this.findPlayers();
+    var playerFired;
+    var index;
+    for(index = 0; index < players.length; index++){
+      if(players[index].id.indexOf(this.client) > 0){
+        playerFired = players[index];
+      }
+    }
+    if(playerFired.fireTime > 0){
+      return;
+    }
+
     var pi = input;
-    var playerPlace = this.findPlayers()[0].translation;
+    var playerPlace = playerFired.translation;
     var listOfBullets = this.bullet.children;
     var coolBullet;
     var test = true;
@@ -245,7 +272,6 @@ this.pointerClick = function( input ) {
         if(listOfBullets[i].enabled === false){
             coolBullet = listOfBullets[i];
             coolBullet.enabled = true;
-            coolBullet.visible = true;
             test = false;
         }
         i++;
@@ -254,12 +280,8 @@ this.pointerClick = function( input ) {
             test = false;
         }
     }
-    coolBullet.translateTo([playerPlace[0] +120,playerPlace[1],0]);
-    var xDistance = playerPlace[0] + 240 - input.globalPosition[0];
-    var yDistance = playerPlace[1] - input.globalPosition[1];
-    var totalDistance = Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
-    coolBullet.xSpeed = -coolBullet.Speed * (xDistance/totalDistance);
-    coolBullet.ySpeed = -coolBullet.Speed * (yDistance/totalDistance);
-    this.future( 1/30 ).moveBullet(coolBullet);
+    this.fire(coolBullet, playerPlace, input.globalPosition, playerFired);
+
 }
+
 //@ sourceURL=index-model.js
