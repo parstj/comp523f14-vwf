@@ -1,6 +1,7 @@
 --- 
 extends: http://vwf.example.com/scene.vwf
 properties:
+  test: false
   ambientColor: [255, 255, 255]
   bulletCount: 0
   distanceForCollision: 12

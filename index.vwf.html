@@ -22,7 +22,15 @@
     right: 20px;
     color: white;
   }
-  
+
+  #start{
+    position: absolute;
+    background: blue;
+    width: 200px;
+    height: 400px;
+    visibility: hidden;
+  }
+
 </style>
 
 <div id="overlay">
@@ -35,4 +43,9 @@
 </div>
 <div id="hud2">
   <div id="enemiesKilled"></div>
+</div>
+<div id="start">
+  <button onclick="easyMode()">Easy</button>
+  <button onclick="mediumMode()">Medium</button>
+  <button onclick="hardMode()">Hard</button>
 </div>
