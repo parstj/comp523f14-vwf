@@ -198,7 +198,7 @@ this.checkIfHitEnemy = function(bullet){
     for(var i = 0; i < enemies.length; i++){
         if(enemies[i].visible === true){
             //Check to see if the bullet hit an enemy
-            if(Math.abs(bullet.translation[0] - enemies[i].translation[0] - 120) < this.distanceForCollision &&
+            if(Math.abs(bullet.translation[0] - enemies[i].translation[0]) < this.distanceForCollision &&
                Math.abs(bullet.translation[1] - enemies[i].translation[1]) < this.distanceForCollision){
                 console.log("I hit an enemy!");
                 enemies[i].health = enemies[i].health - 1;
@@ -249,9 +249,9 @@ this.moveBullet = function( bullet ){
 
 
 this.fire = function( newBull, playerPlace, globalPosition, thePlayer) {
-    newBull.translateTo([playerPlace[0] +120,playerPlace[1],0]);
+    newBull.translateTo([playerPlace[0],playerPlace[1],0]);
     newBull.visible = true;
-    var xDistance = playerPlace[0] + 240 - globalPosition[0];
+    var xDistance = playerPlace[0] - globalPosition[0];
     var yDistance = playerPlace[1] - globalPosition[1];
     var totalDistance = Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
     newBull.xSpeed = -newBull.Speed * (xDistance/totalDistance);
