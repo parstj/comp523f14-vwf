@@ -16,6 +16,7 @@ var enemy = {
     }
 };
 
+
 //Creates the bullet object
 var aBullet = {
     extends: "http://vwf.example.com/node3.vwf",
@@ -42,7 +43,6 @@ var aBullet = {
 };
 
 this.initialize = function() {
-    this.test = true;
     this.future( 0 ).initializeBullets();
     this.future( 0 ).initializeEnemy();
     this.future( 0 ).createEnemy();

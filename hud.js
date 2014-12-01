@@ -19,10 +19,7 @@ vwf_view.satProperty = function(nodeId, propertyName, propertyValue){
 			case "enemiesKilled":
 				div = document.getElementById('enemiesKilled');
 				div.innerHTML = '<p>Enemies Killed: ' + propertyValue + '</p>';
-				break;
-			case "test":
-				document.getElementById('start').style.visibility = 'visible';
-				break;
+				break; 
 		}
 //	}
 };
