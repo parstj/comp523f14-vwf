@@ -90,6 +90,5 @@ scripts:
     }
     
     this.keyDown = this.keyUp = function( input ) {
-      console.log("Fuck");
       this.keyPressInfo = input;
     }
