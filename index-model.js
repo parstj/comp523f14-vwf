@@ -46,8 +46,8 @@ this.initialize = function() {
     this.future( 0 ).initializeBullets();
     this.future( 0 ).initializeEnemy();
     this.future( 0 ).createEnemy();
-    this.future( 30 ).increaseEnemyMoveSpeed();
-    this.future( 120 ).increaseEnemyHealth();
+    this.future( this.healthMultiplierTimer ).increaseEnemyMoveSpeed();
+    this.future( this.moveSpeedTimer ).increaseEnemyHealth();
 }
 
 this.initializeBullets = function(){
@@ -87,25 +87,29 @@ this.createEnemy = function(){
             yPos = yPos * -1;
         }
 
+        //Place the enemy on the board
         newEnemy.translation = [xPos, yPos, 0];
-
+        
+        //Find the closest player to the enemy and start moving towards it
         var closestPlayer = this.calculateClosestPlayer(newEnemy);
         this.calculateEnemyMovement(closestPlayer, newEnemy);
+
+        this.enemyCount++;
     }
 
     this.future(2).createEnemy();
 }
 
+//Increases the enemy's health by 1 after a set period of time
 this.increaseEnemyHealth = function(){
     this.healthMultiplier = this.healthMultiplier + 1;
-    console.log("Increasing health of enemies to: " + this.healthMultiplier);
-    this.future( 120 ).increaseEnemyHealth();
+    this.future( this.healthMultiplierTimer ).increaseEnemyHealth();
 }
 
+//Increases the enemy's movement speed by 0.1 after a set period of time
 this.increaseEnemyMoveSpeed = function(){
     this.moveSpeed = this.moveSpeed +0.1;
-    console.log("Increasing enemy moveSpeed to: " + this.moveSpeed);
-    this.future( 30 ).increaseEnemyMoveSpeed();
+    this.future( this.moveSpeedTimer ).increaseEnemyMoveSpeed();
 }
 
 //Returns a list of all of the players currently connected
@@ -125,6 +129,7 @@ this.findUnusedEnemy = function(){
 }
 
 //Finds the closest player to an enemy
+//Returns the closest player to the object, undefined otherwise
 this.calculateClosestPlayer = function(enemy){
     var closestPlayer;
     var currentDistance;
@@ -185,18 +190,24 @@ this.calculateEnemyMovement = function(closestPlayer, enemy) {
     }
 }
 
+//Takes a bullet and checks each enemy to see if it is close enough to register a hit
+//Returns true if it hit an enemy, false otherwise
 this.checkIfHitEnemy = function(bullet){
     var enemies = this.enemies.children;
+    //Interates through the list of all enemies
     for(var i = 0; i < enemies.length; i++){
         if(enemies[i].visible === true){
-            if(Math.abs(bullet.translation[0] - enemies[i].translation[0] - 120) < 12 &&
-               Math.abs(bullet.translation[1] - enemies[i].translation[1]) < 12){
+            //Check to see if the bullet hit an enemy
+            if(Math.abs(bullet.translation[0] - enemies[i].translation[0] - 120) < this.distanceForCollision &&
+               Math.abs(bullet.translation[1] - enemies[i].translation[1]) < this.distanceForCollision){
                 console.log("I hit an enemy!");
                 enemies[i].health = enemies[i].health - 1;
-                console.log("The enemy's health is: " + enemies[i].health);
+                //If the enemy's health drops below 1, disable it
                 if(enemies[i].health < 1){
                     enemies[i].visible = false;
                     enemies[i].enabled = false;
+                    this.enemyCount--;
+                    this.enemiesKilled++;
                 } 
                 return true;
             }    

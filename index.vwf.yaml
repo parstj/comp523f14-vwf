@@ -3,9 +3,13 @@ extends: http://vwf.example.com/scene.vwf
 properties:
   ambientColor: [255, 255, 255]
   bulletCount: 0
+  distanceForCollision: 12
   enemyCount: 0
+  enemiesKilled: 0
   healthMultiplier: 1.0
+  healthMultiplierTimer: 10
   moveSpeed: 1.0
+  moveSpeedTimer: 5
   makeOwnAvatarVisible: true
   usersShareView: false
   userObject:
