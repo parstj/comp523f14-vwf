@@ -1,6 +1,9 @@
+//how many bullets are currently being fired on each click
 var bulletMode = 1;
+//how many more shots until powerup wears off
 var shotsUntilDowngrade = 0;
 
+//Template for enemies
 var enemy = {
     extends: "http://vwf.example.com/node3.vwf",
     source: "ball.dae",
@@ -19,6 +22,7 @@ var enemy = {
     }
 };
 
+//Template for powerups
 var aPowerUp = {
     extends: "http://vwf.example.com/node3.vwf",
     source: "ball.dae",
@@ -36,7 +40,7 @@ var aPowerUp = {
     },
 };
 
-//Creates the bullet object
+//Template for bullets
 var aBullet = {
     extends: "http://vwf.example.com/node3.vwf",
     source: "ball.dae",
@@ -71,6 +75,7 @@ this.initialize = function() {
     this.future( 120 ).increaseEnemyHealth();
 }
 
+//creates 50 bullets of the aBullet template
 this.initializeBullets = function(){
     for(var i = 0; i < 50; i++){
         var newBullet = $.extend(true, {}, aBullet);
@@ -79,8 +84,8 @@ this.initializeBullets = function(){
     }
 }
 
+//Creates 10 enemies of the enemy template
 this.initializeEnemy = function() {
-    //Creates a list of unused enemies for use by the program
     for(var i = 0; i < 10; i++ ){
         var newEnemy = $.extend(true, {}, enemy);
         this.enemies.children.create("Enemy"+this.enemyCount, newEnemy);
@@ -88,6 +93,7 @@ this.initializeEnemy = function() {
     }
 }
 
+//creates the powerup
 this.initializePowerUp = function(){
     var newPowerUp = $.extend(true, {}, aPowerUp);
     this.powerUps.children.create("powerUp", newPowerUp);
@@ -121,9 +127,10 @@ this.createEnemy = function(){
     this.future(2).createEnemy();
 }
 
+//adds a powerup to the field, if none exists, every 5 seconds
 this.createPowerUp = function(){
     if(this.powerUps.powerUp.visible == false){
-      this.powerUps.powerUp.visible = true;
+      //Randomize the powerup's starting position between -500 and 500 for x and y
       var xPos = Math.random() * 500;
       var yPos = Math.random() * 500;
       if(Math.random() < 0.5){
@@ -132,18 +139,20 @@ this.createPowerUp = function(){
       if(Math.random() < 0.5){
           yPos = yPos * -1;
       }
-
       this.powerUps.powerUp.translation = [xPos, yPos, 0];
+      this.powerUps.powerUp.visible = true;
     }
     this.future(5).createPowerUp();
 }
 
+//Increases enemy health over time
 this.increaseEnemyHealth = function(){
     this.healthMultiplier = this.healthMultiplier + 1;
     console.log("Increasing health of enemies to: " + this.healthMultiplier);
     this.future( 120 ).increaseEnemyHealth();
 }
 
+//Increases enemy speed over time
 this.increaseEnemyMoveSpeed = function(){
     this.moveSpeed = this.moveSpeed +0.1;
     console.log("Increasing enemy moveSpeed to: " + this.moveSpeed);
@@ -174,6 +183,7 @@ this.calculateClosestPlayer = function(enemy){
     var xDistance, yDistance;
     var listOfPlayers = this.findPlayers();
 
+//Loop through the list of players; if a player is closer than previously calculated players, they become the closest player
     if(listOfPlayers){
         for(var i = 0; i < listOfPlayers.length; i++){
             xDistance = enemy.translation[0] - listOfPlayers[i].translation[0];
@@ -190,6 +200,7 @@ this.calculateClosestPlayer = function(enemy){
     return undefined;
 }
 
+//Handles enemy movement AI
 this.calculateEnemyMovement = function(closestPlayer, enemy) {
     if(!closestPlayer){
         closestPlayer = this.calculateClosestPlayer(enemy);
@@ -227,6 +238,7 @@ this.calculateEnemyMovement = function(closestPlayer, enemy) {
     }
 }
 
+//checks hit detection between bullet and each enemy
 this.checkIfHitEnemy = function(bullet){
     var enemies = this.enemies.children;
     for(var i = 0; i < enemies.length; i++){
@@ -246,6 +258,7 @@ this.checkIfHitEnemy = function(bullet){
     }   
 }
 
+//checks hit detection between enemy and a player
 this.enemyHitsPlayer = function (closestPlayer, enemy){
     closestPlayer.health = closestPlayer.health - 1;
     if(closestPlayer.health <= 0){
@@ -253,12 +266,15 @@ this.enemyHitsPlayer = function (closestPlayer, enemy){
     }
 }
 
+//resets a player when they reach 0 health
 this.playerDied = function (closestPlayer){
     closestPlayer.translateTo( [0, 0, 0]);
     closestPlayer.numTimesDead = closestPlayer.numTimesDead + 1;
     closestPlayer.health = 100;
 }
 
+//move a bullet; if it connects with an enemy or powerup, handle that collision
+//if the bullet reaches the edges of the playspace, it deactivates
 this.moveBullet = function( bullet ){
     bullet.translateBy([bullet.xSpeed, bullet.ySpeed, 0]);
     if(bullet.translation[0] > 1000 || bullet.translation[0] < -1000 || bullet.translation[1] > 1000 || bullet.translation[1] < -1000){
@@ -283,7 +299,7 @@ this.moveBullet = function( bullet ){
     }
 }
 
-
+//takes a bullet, moves it to a player's position, and sends it in the direction of the mouseclick's global position
 this.fire = function( newBull, playerPlace, globalPosition, thePlayer) {
     newBull.translateTo([playerPlace[0] +120,playerPlace[1],0]);
     newBull.visible = true;
@@ -296,28 +312,30 @@ this.fire = function( newBull, playerPlace, globalPosition, thePlayer) {
     this.future( 1/30 ).moveBullet(newBull);
 }
 
+//event handler for left mouse click -- fires a bullet from the player
 this.pointerClick = function( input ) {
     var players = this.findPlayers();
     var playerFired;
     var index;
     for(index = 0; index < players.length; index++){
-      if(players[index].id.indexOf(this.client) > 0){
+      if(players[index].id.indexOf(this.client) > 0){ //is this the player that fired?
         playerFired = players[index];
       }
     }
-    if(playerFired.fireTime > 0){
+    if(playerFired.fireTime > 0){ //if the player has fired too recently, they can't fire right now (UNIMPLEMENTED)
       return;
     }
 
     var pi = input;
-    for(var j=0; j < bulletMode; j++){
+    for(var j=0; j < bulletMode; j++){//runs through the bullet firing process multiple times if the players can fire multiple bullets at a time
+      //keep this for loop around the entire process, or else if the player is moving then the fourth or fifth bullet will still fire out of the original place, which looks weird!
       var playerPlace = playerFired.translation;
       var listOfBullets = this.bullet.children;
       var coolBullet;
       var test = true;
       var i = 0;
       while(test){
-          if(listOfBullets[i].enabled === false){
+          if(listOfBullets[i].enabled === false){ //find an unused bullet
               coolBullet = listOfBullets[i];
               coolBullet.enabled = true;
               test = false;
@@ -329,6 +347,8 @@ this.pointerClick = function( input ) {
           }
       }
       this.future(j * 2/30).fire(coolBullet, playerPlace, input.globalPosition, playerFired);
+      //this.future(j * 2/30) delays each bullet after the 0th to space out each shot
+      //.fire( ... ) fires the bullet just generated
 
     }
     if(shotsUntilDowngrade > 1){
