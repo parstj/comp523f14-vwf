@@ -1,6 +1,9 @@
+var bulletMode = 1;
+var shotsUntilDowngrade = 0;
+
 var enemy = {
     extends: "http://vwf.example.com/node3.vwf",
-    source: "ball3.dae",
+    source: "ball.dae",
     properties: {
         enabled: false,
         visible: false,
@@ -16,6 +19,22 @@ var enemy = {
     }
 };
 
+var aPowerUp = {
+    extends: "http://vwf.example.com/node3.vwf",
+    source: "ball.dae",
+    properties: {
+      translation: [2,4,0],
+      visible: false
+    },
+    children: {
+      material: {
+        extends: "http://vwf.example.com/material.vwf",
+        properties:{
+          color: "#ff0011"
+        }
+      },
+    },
+};
 
 //Creates the bullet object
 var aBullet = {
@@ -46,8 +65,10 @@ this.initialize = function() {
     this.future( 0 ).initializeBullets();
     this.future( 0 ).initializeEnemy();
     this.future( 0 ).createEnemy();
-    this.future( this.healthMultiplierTimer ).increaseEnemyMoveSpeed();
-    this.future( this.moveSpeedTimer ).increaseEnemyHealth();
+    this.future( 0 ).initializePowerUp();
+    this.future( 0 ).createPowerUp();
+    this.future( 30 ).increaseEnemyMoveSpeed();
+    this.future( 120 ).increaseEnemyHealth();
 }
 
 this.initializeBullets = function(){
@@ -67,6 +88,10 @@ this.initializeEnemy = function() {
     }
 }
 
+this.initializePowerUp = function(){
+    var newPowerUp = $.extend(true, {}, aPowerUp);
+    this.powerUps.children.create("powerUp", newPowerUp);
+}
 
 
 //Adds an enemy on the screen every 2 seconds if there are not the max number of enemies
@@ -87,29 +112,42 @@ this.createEnemy = function(){
             yPos = yPos * -1;
         }
 
-        //Place the enemy on the board
         newEnemy.translation = [xPos, yPos, 0];
-        
-        //Find the closest player to the enemy and start moving towards it
+
         var closestPlayer = this.calculateClosestPlayer(newEnemy);
         this.calculateEnemyMovement(closestPlayer, newEnemy);
-
-        this.enemyCount++;
     }
 
     this.future(2).createEnemy();
 }
 
-//Increases the enemy's health by 1 after a set period of time
-this.increaseEnemyHealth = function(){
-    this.healthMultiplier = this.healthMultiplier + 1;
-    this.future( this.healthMultiplierTimer ).increaseEnemyHealth();
+this.createPowerUp = function(){
+    if(this.powerUps.powerUp.visible == false){
+      this.powerUps.powerUp.visible = true;
+      var xPos = Math.random() * 500;
+      var yPos = Math.random() * 500;
+      if(Math.random() < 0.5){
+          xPos = xPos * -1;
+      }
+      if(Math.random() < 0.5){
+          yPos = yPos * -1;
+      }
+
+      this.powerUps.powerUp.translation = [xPos, yPos, 0];
+    }
+    this.future(5).createPowerUp();
 }
 
-//Increases the enemy's movement speed by 0.1 after a set period of time
+this.increaseEnemyHealth = function(){
+    this.healthMultiplier = this.healthMultiplier + 1;
+    console.log("Increasing health of enemies to: " + this.healthMultiplier);
+    this.future( 120 ).increaseEnemyHealth();
+}
+
 this.increaseEnemyMoveSpeed = function(){
     this.moveSpeed = this.moveSpeed +0.1;
-    this.future( this.moveSpeedTimer ).increaseEnemyMoveSpeed();
+    console.log("Increasing enemy moveSpeed to: " + this.moveSpeed);
+    this.future( 30 ).increaseEnemyMoveSpeed();
 }
 
 //Returns a list of all of the players currently connected
@@ -129,7 +167,6 @@ this.findUnusedEnemy = function(){
 }
 
 //Finds the closest player to an enemy
-//Returns the closest player to the object, undefined otherwise
 this.calculateClosestPlayer = function(enemy){
     var closestPlayer;
     var currentDistance;
@@ -190,24 +227,18 @@ this.calculateEnemyMovement = function(closestPlayer, enemy) {
     }
 }
 
-//Takes a bullet and checks each enemy to see if it is close enough to register a hit
-//Returns true if it hit an enemy, false otherwise
 this.checkIfHitEnemy = function(bullet){
     var enemies = this.enemies.children;
-    //Interates through the list of all enemies
     for(var i = 0; i < enemies.length; i++){
         if(enemies[i].visible === true){
-            //Check to see if the bullet hit an enemy
-            if(Math.abs(bullet.translation[0] - enemies[i].translation[0]) < this.distanceForCollision &&
-               Math.abs(bullet.translation[1] - enemies[i].translation[1]) < this.distanceForCollision){
+            if(Math.abs(bullet.translation[0] - enemies[i].translation[0] - 120) < 12 &&
+               Math.abs(bullet.translation[1] - enemies[i].translation[1]) < 12){
                 console.log("I hit an enemy!");
                 enemies[i].health = enemies[i].health - 1;
-                //If the enemy's health drops below 1, disable it
+                console.log("The enemy's health is: " + enemies[i].health);
                 if(enemies[i].health < 1){
                     enemies[i].visible = false;
                     enemies[i].enabled = false;
-                    this.enemyCount--;
-                    this.enemiesKilled++;
                 } 
                 return true;
             }    
@@ -242,6 +273,11 @@ this.moveBullet = function( bullet ){
         bullet.xSpeed = 0;
         bullet.ySpeed = 0;   
     }
+    if(this.checkIfHitPowerUp(bullet) === true){
+        bulletMode = bulletMode + 1;
+        shotsUntilDowngrade = shotsUntilDowngrade + 7;
+        this.powerUps.powerUp.visible = false;
+    }
     if(bullet.enabled){
         this.future( 1/30 ).moveBullet(bullet);
     }
@@ -249,14 +285,14 @@ this.moveBullet = function( bullet ){
 
 
 this.fire = function( newBull, playerPlace, globalPosition, thePlayer) {
-    newBull.translateTo([playerPlace[0],playerPlace[1],0]);
+    newBull.translateTo([playerPlace[0] +120,playerPlace[1],0]);
     newBull.visible = true;
-    var xDistance = playerPlace[0] - globalPosition[0];
+    var xDistance = playerPlace[0] + 240 - globalPosition[0];
     var yDistance = playerPlace[1] - globalPosition[1];
     var totalDistance = Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
     newBull.xSpeed = -newBull.Speed * (xDistance/totalDistance);
     newBull.ySpeed = -newBull.Speed * (yDistance/totalDistance);
-    //thePlayer.fireTime = 25;
+    //thePlayer.fireTime = 25; //line to reset timer on firing
     this.future( 1/30 ).moveBullet(newBull);
 }
 
@@ -274,25 +310,51 @@ this.pointerClick = function( input ) {
     }
 
     var pi = input;
-    var playerPlace = playerFired.translation;
-    var listOfBullets = this.bullet.children;
-    var coolBullet;
-    var test = true;
-    var i = 0;
-    while(test){
-        if(listOfBullets[i].enabled === false){
-            coolBullet = listOfBullets[i];
-            coolBullet.enabled = true;
-            test = false;
-        }
-        i++;
-        
-        if(i>listOfBullets.length){
-            test = false;
-        }
-    }
-    this.fire(coolBullet, playerPlace, input.globalPosition, playerFired);
+    for(var j=0; j < bulletMode; j++){
+      var playerPlace = playerFired.translation;
+      var listOfBullets = this.bullet.children;
+      var coolBullet;
+      var test = true;
+      var i = 0;
+      while(test){
+          if(listOfBullets[i].enabled === false){
+              coolBullet = listOfBullets[i];
+              coolBullet.enabled = true;
+              test = false;
+          }
+          i++;
 
+          if(i>listOfBullets.length){
+              test = false;
+          }
+      }
+      this.future(j * 2/30).fire(coolBullet, playerPlace, input.globalPosition, playerFired);
+
+    }
+    if(shotsUntilDowngrade > 1){
+      shotsUntilDowngrade--;
+    }
+    else if(shotsUntilDowngrade == 1){
+      shotsUntilDowngrade--;
+      bulletMode--;
+      if(bulletMode > 1){
+        shotsUntilDowngrade = 1;
+      }
+    }
 }
 
+//keeps track of the closest player to powerup
+//if close enough, player picks up powerup
+this.checkIfHitPowerUp = function(bullet) {
+    var powerUp = this.powerUps.children;
+    for(var i = 0; i < powerUp.length; i++){
+        if(powerUp[i].visible === true){
+            if(Math.abs(bullet.translation[0] - powerUp[i].translation[0] - 120) < 12 &&
+               Math.abs(bullet.translation[1] - powerUp[i].translation[1]) < 12){
+                console.log("I hit a powerup!");
+                return true;
+            }
+        }
+    }
+}
 //@ sourceURL=index-model.js
