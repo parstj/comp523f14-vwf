@@ -89,8 +89,8 @@ this.initializePowerUp = function(){
 
 //Adds an enemy on the screen every 2 seconds if there are not the max number of enemies
 this.createEnemy = function(){
-    if(this.enemyCount === 0){
-        this.incrementWave();
+    if(this.totalEnemies >= this.enemyCount){
+        //Do nothing
     }
     else{
         var newEnemy = this.findUnusedEnemy(); //Check to see if we can add a new enemy
@@ -112,6 +112,8 @@ this.createEnemy = function(){
 
             var closestPlayer = this.calculateClosestPlayer(newEnemy);
             this.calculateEnemyMovement(closestPlayer, newEnemy);
+
+            this.totalEnemies++;
         }
     }
 
@@ -138,7 +140,7 @@ this.createPowerUp = function(){
 
 //Increases enemy health over time
 this.increaseEnemyHealth = function(){
-    this.healthMultiplier = this.healthMultiplier + 0.2;
+    this.healthMultiplier = this.healthMultiplier + 0.5;
 }
 
 //Increases enemy speed over time
@@ -236,11 +238,18 @@ this.checkIfHitEnemy = function(bullet){
         if(enemies[i].visible === true){
             if(Math.abs(bullet.translation[0] - enemies[i].translation[0] - 120) < 12 &&
                Math.abs(bullet.translation[1] - enemies[i].translation[1]) < 12){
+                //Subtract the enemy's health
                 enemies[i].health = enemies[i].health - this.bulletMode;
+                //Detect if the enemy has died
                 if(enemies[i].health < 1){
                     enemies[i].visible = false;
                     enemies[i].enabled = false;
                     this.enemyCount--;
+                    this.totalEnemies--;
+                    //If there are no more enemies left, increment the wave
+                    if(this.enemyCount === 0){
+                        this.incrementWave();
+                    }
                     this.enemiesKilled++;
                 } 
                 return true;
@@ -251,8 +260,8 @@ this.checkIfHitEnemy = function(bullet){
 
 //checks hit detection between enemy and a player
 this.enemyHitsPlayer = function (closestPlayer, enemy){
-    closestPlayer.health = closestPlayer.health - 1;
-    if(closestPlayer.health <= 0){
+    closestPlayer.playerHealth = closestPlayer.playerHealth - 1;
+    if(closestPlayer.playerHealth <= 0){
         this.playerDied(closestPlayer);
     }
 }
@@ -261,7 +270,8 @@ this.enemyHitsPlayer = function (closestPlayer, enemy){
 this.playerDied = function (closestPlayer){
     closestPlayer.translateTo( [0, 0, 0]);
     closestPlayer.numTimesDead = closestPlayer.numTimesDead + 1;
-    closestPlayer.health = 100;
+    closestPlayer.playerHealth = 100;
+    this.livesRemaining--;
 }
 
 //move a bullet; if it connects with an enemy or powerup, handle that collision

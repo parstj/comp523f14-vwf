@@ -11,6 +11,8 @@ properties:
   moveSpeed: 1.0
   makeOwnAvatarVisible: true
   shotsUntilDowngrade: 0
+  totalEnemies: 0
+  livesRemaining: 5
   usersShareView: false
   waveCounter: 1
   userObject:
@@ -19,7 +21,7 @@ properties:
     properties:
       translationSpeed: 100
       rotationSpeed: 0
-      health: 100
+      playerHealth: 100
       numTimesDead: 0
       navmode: walk
       lookmode: none
