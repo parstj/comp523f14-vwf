@@ -14,10 +14,12 @@ scripts:
 
     var fireTime = 0;
 
-    this.initialize = function() {
+    this.initialize = function() 
+    {
       this.id = this.client;
       this.future( 0 ).initializeCamera();
       this.future( 0 ).update();
+      this.playerCount++;
     }
 
     this.initializeCamera = function() {
@@ -59,6 +61,8 @@ scripts:
     }
 
     this.movePlayer = function( direction ) {
+    //Checks to confirm we aren't still waiting in pre-game
+    if(this.gameMode>0){
       switch( direction ) {
         case 'U':
           //Checks to see if the player collides with the end of the board
@@ -87,9 +91,9 @@ scripts:
         default:
           break;
       }
+     }
     }
     
-    this.keyDown = this.keyUp = function( input )
-	{
+    this.keyDown = this.keyUp = function( input ) {
       this.keyPressInfo = input;
     }

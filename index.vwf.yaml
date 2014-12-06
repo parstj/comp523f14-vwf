@@ -3,22 +3,27 @@ extends: http://vwf.example.com/scene.vwf
 properties:
   ambientColor: [255, 255, 255]
   bulletCount: 0
+  bulletMode: 1
   distanceForCollision: 12
-  enemyCount: 0
+  enemyCount: 20
   enemiesKilled: 0
   healthMultiplier: 1.0
-  healthMultiplierTimer: 10
   moveSpeed: 1.0
-  moveSpeedTimer: 5
   makeOwnAvatarVisible: true
+  shotsUntilDowngrade: 0
+  totalEnemies: 0
+  livesRemaining: 5
   usersShareView: false
+  waveCounter: 1
+  countDown: 30
+  playerCount: 0
   userObject:
     extends: http://vwf.example.com/node3.vwf
     implements: [ "http://vwf.example.com/navigable.vwf" ]
     properties:
       translationSpeed: 100
       rotationSpeed: 0
-      health: 100
+      playerHealth: 100
       numTimesDead: 0
       navmode: walk
       lookmode: none
@@ -36,8 +41,7 @@ properties:
         type: model/vnd.collada+xml
         properties:
           scale: .3
-          #rotation: [0,0,1,180]
-        children:       
+        children:
           material:
             extends: http://vwf.example.com/material.vwf
             properties:
@@ -61,20 +65,26 @@ properties:
         }
         //@ sourceURL=transformedChanged.vwf   
 methods:
+  startGame:
   calculateEnemyMovement:
   calculateClosestPlayer:
   checkIfHitEnemy: 
-  createEnemy: 
+  checkIfHitPowerup:
+  createEnemy:
+  createPowerUp:
   enemyHitsPlayer:
   findPlayers:
   findUnusedEnemy:
+  fire:
+  count_to_zero:
   increaseEnemyHealth:
   increaseEnemyMoveSpeed:
+  incrementWave:
   initializeBullets:
   initializeEnemy:
-  playerDied:
+  initializePowerUp:
   moveBullet:
-  fire:
+  playerDied:
 children:
   board:
     extends: http://vwf.example.com/node3.vwf
@@ -85,6 +95,8 @@ children:
   enemies:
     extends: http://vwf.example.com/node3.vwf
   bullet:
+    extends: http://vwf.example.com/node3.vwf
+  powerUps:
     extends: http://vwf.example.com/node3.vwf
 scripts:
 - source: "index-model.js"

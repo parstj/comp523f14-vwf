@@ -4,8 +4,8 @@
         <contributor>
             <authoring_tool>SketchUp 14.1.1282</authoring_tool>
         </contributor>
-        <created>2014-12-01T15:03:33Z</created>
-        <modified>2014-12-01T15:03:33Z</modified>
+        <created>2014-12-06T08:34:25Z</created>
+        <modified>2014-12-06T08:34:25Z</modified>
         <unit meter="0.0254" name="inch" />
         <up_axis>Z_UP</up_axis>
     </asset>
@@ -13,7 +13,7 @@
         <visual_scene id="ID1">
             <node name="SketchUp">
                 <node id="ID2" name="image_0">
-                    <matrix>0.4607135 0 0 -84.29119 0 0.4607135 0 -83.14594 0 0 1 2.755906 0 0 0 1</matrix>
+                    <matrix>0.4691781 0 0 -87.47913 0 0.4691781 0 -90.93922 0 0 1 0 0 0 0 1</matrix>
                     <instance_geometry url="#ID3">
                         <bind_material>
                             <technique_common>
@@ -31,7 +31,7 @@
         <geometry id="ID3">
             <mesh>
                 <source id="ID9">
-                    <float_array id="ID13" count="24">0 360 0 0 0 0 360 360 0 360 0 0 360 360 0 0 0 0 0 360 0 360 0 0</float_array>
+                    <float_array id="ID13" count="24">0 444 0 0 0 0 360 444 0 360 0 0 360 444 0 0 0 0 0 444 0 360 0 0</float_array>
                     <technique_common>
                         <accessor count="8" source="#ID13" stride="3">
                             <param name="X" type="float" />

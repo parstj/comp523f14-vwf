@@ -4,98 +4,84 @@
         <contributor>
             <authoring_tool>SketchUp 14.1.1282</authoring_tool>
         </contributor>
-        <created>2014-12-01T15:00:00Z</created>
-        <modified>2014-12-01T15:00:00Z</modified>
+        <created>2014-12-06T08:34:48Z</created>
+        <modified>2014-12-06T08:34:48Z</modified>
         <unit meter="0.0254" name="inch" />
         <up_axis>Z_UP</up_axis>
     </asset>
     <library_visual_scenes>
         <visual_scene id="ID1">
             <node name="SketchUp">
-                <node id="ID2" name="instance_0">
-                    <matrix>1 0 0 -0.2430706 0 1 0 0.610627 0 0 1 -7.086614 0 0 0 1</matrix>
-                    <instance_node url="#ID3" />
+                <node id="ID2" name="image_0">
+                    <matrix>0.4492801 0 0 -89.1549 0 0.4492801 0 -83.32306 0 0 1 -2.842171e-014 0 0 0 1</matrix>
+                    <instance_geometry url="#ID3">
+                        <bind_material>
+                            <technique_common>
+                                <instance_material symbol="Material2" target="#ID4">
+                                    <bind_vertex_input semantic="UVSET0" input_semantic="TEXCOORD" input_set="0" />
+                                </instance_material>
+                            </technique_common>
+                        </bind_material>
+                    </instance_geometry>
                 </node>
             </node>
         </visual_scene>
     </library_visual_scenes>
-    <library_nodes>
-        <node id="ID3" name="skp1928">
-            <node id="ID4" name="instance_1">
-                <matrix>1 0 0 2.338164 0 1 0 1.426156 0 0 1 -6.19976 0 0 0 1</matrix>
-                <instance_node url="#ID5" />
-            </node>
-        </node>
-        <node id="ID5" name="Component_8">
-            <node id="ID6" name="image_0">
-                <matrix>0.1866641 0 0 -33.3775 0 0.1866641 0 -33.69911 0 0 1 13.79371 0 0 0 1</matrix>
-                <instance_geometry url="#ID7">
-                    <bind_material>
-                        <technique_common>
-                            <instance_material symbol="Material2" target="#ID8">
-                                <bind_vertex_input semantic="UVSET0" input_semantic="TEXCOORD" input_set="0" />
-                            </instance_material>
-                        </technique_common>
-                    </bind_material>
-                </instance_geometry>
-            </node>
-        </node>
-    </library_nodes>
     <library_geometries>
-        <geometry id="ID7">
+        <geometry id="ID3">
             <mesh>
-                <source id="ID13">
-                    <float_array id="ID17" count="24">0 336 0 0 0 0 336 336 0 336 0 0 336 336 0 0 0 0 0 336 0 336 0 0</float_array>
+                <source id="ID9">
+                    <float_array id="ID13" count="24">0 368 0 0 0 0 371 368 0 371 0 0 371 368 0 0 0 0 0 368 0 371 0 0</float_array>
                     <technique_common>
-                        <accessor count="8" source="#ID17" stride="3">
+                        <accessor count="8" source="#ID13" stride="3">
                             <param name="X" type="float" />
                             <param name="Y" type="float" />
                             <param name="Z" type="float" />
                         </accessor>
                     </technique_common>
                 </source>
-                <source id="ID16">
-                    <float_array id="ID19" count="8">0 1 0 0 1 1 1 0</float_array>
+                <source id="ID12">
+                    <float_array id="ID15" count="8">0 1 0 0 1 1 1 0</float_array>
                     <technique_common>
-                        <accessor count="4" source="#ID19" stride="2">
+                        <accessor count="4" source="#ID15" stride="2">
                             <param name="S" type="float" />
                             <param name="T" type="float" />
                         </accessor>
                     </technique_common>
                 </source>
-                <vertices id="ID15">
-                    <input semantic="POSITION" source="#ID13" />
+                <vertices id="ID11">
+                    <input semantic="POSITION" source="#ID9" />
                 </vertices>
                 <triangles count="4" material="Material2">
-                    <input offset="0" semantic="VERTEX" source="#ID15" />
-                    <input offset="1" semantic="TEXCOORD" source="#ID16" />
+                    <input offset="0" semantic="VERTEX" source="#ID11" />
+                    <input offset="1" semantic="TEXCOORD" source="#ID12" />
                     <p>0 0 1 1 2 2 3 3 2 2 1 1 4 2 5 1 6 0 5 1 4 2 7 3</p>
                 </triangles>
             </mesh>
         </geometry>
     </library_geometries>
     <library_materials>
-        <material id="ID8" name="material">
-            <instance_effect url="#ID9" />
+        <material id="ID4" name="material">
+            <instance_effect url="#ID5" />
         </material>
     </library_materials>
     <library_effects>
-        <effect id="ID9">
+        <effect id="ID5">
             <profile_COMMON>
-                <newparam sid="ID11">
+                <newparam sid="ID7">
                     <surface type="2D">
-                        <init_from>ID10</init_from>
+                        <init_from>ID6</init_from>
                     </surface>
                 </newparam>
-                <newparam sid="ID12">
+                <newparam sid="ID8">
                     <sampler2D>
-                        <source>ID11</source>
+                        <source>ID7</source>
                     </sampler2D>
                 </newparam>
                 <technique sid="COMMON">
                     <lambert>
                         <diffuse>
-                            <texture texture="ID12" texcoord="UVSET0" />
+                            <texture texture="ID8" texcoord="UVSET0" />
                         </diffuse>
                     </lambert>
                 </technique>
@@ -103,7 +89,7 @@
         </effect>
     </library_effects>
     <library_images>
-        <image id="ID10">
+        <image id="ID6">
             <init_from>textures/sloth.png</init_from>
         </image>
     </library_images>
