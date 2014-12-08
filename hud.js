@@ -25,7 +25,7 @@ vwf_view.satProperty = function(nodeId, propertyName, propertyValue){
 			break;			 
 		case "enemiesKilled":
 			div = document.getElementById('enemiesKilled');
-			div.innerHTML = '<p> <img src=\"UI_Elements/SlothIcon.png\" height=\"40px\">  ' + propertyValue + '</p>';
+			div.innerHTML = '<p> Enemies killed: ' + propertyValue + '</p>';
 			break; 
 		case "shotsUntilDowngrade":
 			div = document.getElementById('numberBulletsLeft');

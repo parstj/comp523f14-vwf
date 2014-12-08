@@ -15,7 +15,7 @@ properties:
   livesRemaining: 5
   usersShareView: false
   waveCounter: 1
-  countDown: 30
+  countDown: 10
   playerCount: 0
   userObject:
     extends: http://vwf.example.com/node3.vwf

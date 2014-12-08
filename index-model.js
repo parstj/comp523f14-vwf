@@ -32,6 +32,10 @@ var aPowerUp = {
     },
     children: {
       material: {
+        extends: "http://vwf.example.com/material.vwf",
+            properties: {
+              transparent: true
+            },
       },
     },
 };
@@ -39,7 +43,7 @@ var aPowerUp = {
 //Template for bullets
 var aBullet = {
     extends: "http://vwf.example.com/node3.vwf",
-    source: "models/Orange.dae",
+    source: "models/orange.dae",
     properties: {
         enabled: false,
         visible: false,
@@ -64,11 +68,11 @@ this.initialize = function()
 {
 	//Delay is added to ensure player initialization doesn't interrupt proper enemy initialization
     this.future(0).count_to_zero();
-	this.future(30).initializeBullets();
-	this.future(30).initializeEnemy();
-	this.future(30).createEnemy();
-	this.future(30).initializePowerUp();
-	this.future(30).createPowerUp();
+	this.future(0).initializeBullets();
+	this.future(0).initializeEnemy();
+    this.future(0).initializePowerUp();
+	this.future(10).createEnemy();
+	this.future(10).createPowerUp();
 }
 
 //creates 50 bullets of the aBullet template
